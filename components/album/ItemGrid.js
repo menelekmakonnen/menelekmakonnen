@@ -161,6 +161,12 @@ function ItemCard({ item, index, type, onClick }) {
       const videoId = item.youtubeUrl.split('v=')[1] || item.youtubeUrl.split('/').pop();
       return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
     }
+    if (item.instagramUrl || item.embedCode) {
+      const code = item.embedCode || item.instagramUrl?.split('/p/')[1]?.split('/')?.[0] || '';
+      if (code) {
+        return `https://www.instagram.com/p/${code}/media/?size=l`;
+      }
+    }
     return null;
   };
 

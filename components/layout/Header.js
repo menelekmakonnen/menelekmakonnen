@@ -127,8 +127,8 @@ function PremiumNavIcon() {
       >
         <motion.div
           className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-black/40 shadow-inner"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+          animate={{ rotateZ: [-12, 12, -12] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
         >
           <GlobeAltIcon className="h-5 w-5 text-white/70" />
         </motion.div>

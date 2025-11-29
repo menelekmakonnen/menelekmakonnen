@@ -18,9 +18,8 @@ export default function CameraVisualEffects() {
   const getBlurIntensity = () => {
     // Lower aperture (wider opening) = more blur
     const aperture = cameraSettings.aperture;
-    if (aperture <= 1.8) return '4px';
-    if (aperture <= 2.8) return '2px';
-    if (aperture <= 4) return '1px';
+    if (aperture <= 1.8) return '3px';
+    if (aperture <= 2) return '1.5px';
     return '0px';
   };
 

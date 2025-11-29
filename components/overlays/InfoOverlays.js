@@ -10,8 +10,8 @@ import { VIDEO_EDIT_ALBUMS } from '@/lib/data/videoEdits';
 import { ALL_LINKS } from '@/lib/data/links';
 import { TITLE_POOL, INITIAL_TITLES } from '@/lib/constants/titles';
 
-// Calculate total file count based on current page
-function getFileCount(currentPage) {
+// Calculate file counts based on available data
+function getPageFileCount(currentPage) {
   switch (currentPage) {
     case PAGES.FILMS:
       return FILMS.length + MUSIC_VIDEOS.length;
@@ -19,16 +19,15 @@ function getFileCount(currentPage) {
       return Object.values(VIDEO_EDIT_ALBUMS).reduce((total, album) => total + album.items.length, 0);
     case PAGES.LINKS:
       return ALL_LINKS.length;
-    case PAGES.LOREMAKER:
-      // Loremaker loads dynamically, so we show a placeholder
-      return '~200+';
-    case PAGES.PHOTOGRAPHY:
-    case PAGES.AI_ALBUMS:
-      // These will be loaded from Google Drive in the future
-      return 'TBD';
     default:
       return 0;
   }
+}
+
+function getTotalFileCount() {
+  const filmsTotal = FILMS.length + MUSIC_VIDEOS.length;
+  const videoEditTotal = Object.values(VIDEO_EDIT_ALBUMS).reduce((total, album) => total + album.items.length, 0);
+  return filmsTotal + videoEditTotal;
 }
 
 export default function InfoOverlays() {
@@ -45,7 +44,8 @@ export default function InfoOverlays() {
 }
 
 function TopLeftInfo({ currentPage }) {
-  const fileCount = getFileCount(currentPage);
+  const fileCount = getPageFileCount(currentPage);
+  const totalCount = getTotalFileCount();
   const [subtitles, setSubtitles] = useState(INITIAL_TITLES);
   const [intervalId, setIntervalId] = useState(null);
 
@@ -101,16 +101,19 @@ function TopLeftInfo({ currentPage }) {
     <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
-      className="fixed top-20 left-4 z-30 space-y-1 font-mono text-xs text-white/60"
+      className="fixed top-20 left-4 z-30 space-y-2 font-mono text-xs text-white/80"
     >
-      <div className="rounded border border-white/10 bg-black/30 px-2 py-1 backdrop-blur-sm">
+      <div className="rounded border border-emerald-400/30 bg-black/60 px-2 py-1 text-emerald-200 backdrop-blur-sm">
         {PAGE_DISPLAY_NAMES[currentPage] || 'UNKNOWN'}
       </div>
       {fileCount !== 0 && (
-        <div className="text-[10px] text-white/40">
-          FILES: {fileCount}
+        <div className="text-[10px] text-emerald-200/80">
+          Files here: {fileCount}
         </div>
       )}
+      <div className="text-[10px] text-white/50">
+        Library ready: {totalCount}
+      </div>
 
       {/* Rotating subtitles - relocated here */}
       <div className="flex flex-col gap-1 mt-2">

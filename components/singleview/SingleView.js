@@ -11,13 +11,16 @@ import {
 } from '@heroicons/react/24/outline';
 import { useApp } from '@/contexts/AppContext';
 import { cn } from '@/lib/utils/helpers';
+import { HUD_MODES, LENS_MODES } from '@/lib/constants/camera';
 
 export default function SingleView({ item, items, albums = [], currentAlbumId, onClose }) {
   const {
     isSingleViewExpanded,
     setIsSingleViewExpanded,
     isSlideshowActive,
-    setIsSlideshowActive
+    setIsSlideshowActive,
+    setHudMode,
+    cameraSettings
   } = useApp();
 
   const [currentIndex, setCurrentIndex] = useState(
@@ -88,6 +91,12 @@ export default function SingleView({ item, items, albums = [], currentAlbumId, o
     setCurrentIndex(prev => (prev < items.length - 1 ? prev + 1 : 0));
   }, [items.length]);
 
+  // HUD visibility rules for Single View vs Expanded
+  useEffect(() => {
+    setHudMode(isSingleViewExpanded ? HUD_MODES.HIDDEN : HUD_MODES.PARTIAL);
+    return () => setHudMode(HUD_MODES.FULL);
+  }, [isSingleViewExpanded, setHudMode]);
+
   const handlePreviousAlbum = useCallback(() => {
     if (albums.length === 0) return;
     const currentAlbumIndex = albums.findIndex(a => a.id === selectedAlbumId);
@@ -148,7 +157,11 @@ export default function SingleView({ item, items, albums = [], currentAlbumId, o
             'relative w-full',
             isSingleViewExpanded ? 'h-full' : 'max-w-5xl'
           )}>
-            <MainDisplay item={currentItem} expanded={isSingleViewExpanded} />
+            <MainDisplay
+              item={currentItem}
+              expanded={isSingleViewExpanded}
+              lensMode={cameraSettings.lensMode}
+            />
 
             {/* Navigation arrows */}
             <button
@@ -189,7 +202,7 @@ export default function SingleView({ item, items, albums = [], currentAlbumId, o
   );
 }
 
-function MainDisplay({ item, expanded }) {
+function MainDisplay({ item, expanded, lensMode }) {
   // Render different content based on item type
   if (item.youtubeUrl) {
     return <YouTubeEmbed url={item.youtubeUrl} expanded={expanded} />;
@@ -200,7 +213,14 @@ function MainDisplay({ item, expanded }) {
   }
 
   if (item.coverImage || item.thumbnail) {
-    return <ImageDisplay src={item.coverImage || item.thumbnail} alt={item.title || item.name || item.character} expanded={expanded} />;
+    return (
+      <ImageDisplay
+        src={item.coverImage || item.thumbnail}
+        alt={item.title || item.name || item.character}
+        expanded={expanded}
+        lensMode={lensMode}
+      />
+    );
   }
 
   return (
@@ -251,7 +271,7 @@ function InstagramEmbed({ url, embedCode, expanded }) {
   );
 }
 
-function ImageDisplay({ src, alt, expanded }) {
+function ImageDisplay({ src, alt, expanded, lensMode }) {
   const [zoom, setZoom] = useState(1);
 
   const handleWheel = (e) => {
@@ -259,7 +279,8 @@ function ImageDisplay({ src, alt, expanded }) {
 
     e.preventDefault();
     const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    setZoom(prev => Math.max(0.5, Math.min(3, prev + delta)));
+    const maxZoom = lensMode === LENS_MODES.MACRO ? 5 : 3;
+    setZoom(prev => Math.max(0.5, Math.min(maxZoom, prev + delta)));
   };
 
   const resetZoom = () => setZoom(1);
@@ -284,6 +305,13 @@ function ImageDisplay({ src, alt, expanded }) {
           transform: expanded ? `scale(${zoom})` : 'none'
         }}
       />
+
+      {/* Macro overlay */}
+      {expanded && lensMode === LENS_MODES.MACRO && (
+        <div className="absolute top-4 left-4 rounded-full bg-black/60 px-3 py-1 text-xs text-white/80">
+          Macro • {zoom.toFixed(1)}x
+        </div>
+      )}
 
       {/* Zoom reset button */}
       {expanded && zoom !== 1 && (

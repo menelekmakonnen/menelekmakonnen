@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import { fetchLoremakerCharacters, getRandomCharacters, filterCharactersWithImages } from '@/lib/data/loremaker';
+import { getDriveImageUrl } from '@/lib/data/googleDrive';
 import ItemGrid from '../album/ItemGrid';
 import SingleView from '../singleview/SingleView';
 
@@ -85,7 +86,7 @@ export default function LoremakerPage() {
             ...char,
             id: char.character,
             name: char.character,
-            thumbnail: char.coverImage || char.galleryImages[0],
+            thumbnail: getDriveImageUrl(char.coverImage) || getDriveImageUrl(char.galleryImages[0]) || char.coverImage || char.galleryImages[0],
             description: char.shortDescription
           }))}
           onItemClick={handleItemClick}
@@ -149,7 +150,7 @@ function CharacterSingleView({ character, characters, onClose }) {
             {/* Image */}
             <div className="relative aspect-square overflow-hidden rounded-lg">
               <img
-                src={character.coverImage || character.galleryImages?.[0]}
+                src={getDriveImageUrl(character.coverImage) || getDriveImageUrl(character.galleryImages?.[0]) || character.coverImage || character.galleryImages?.[0]}
                 alt={character.character}
                 className="h-full w-full object-cover"
               />

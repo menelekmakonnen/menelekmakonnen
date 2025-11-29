@@ -7,7 +7,8 @@ export default function KeyboardHandler() {
     navigateToNextPage,
     handleEscapeKey,
     setShowShortcutsHelp,
-    isPoweredOn
+    isPoweredOn,
+    singleViewItem
   } = useApp();
 
   useEffect(() => {
@@ -18,6 +19,9 @@ export default function KeyboardHandler() {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
         return;
       }
+
+      // Let Single View own arrow keys without page navigation interference
+      if (singleViewItem) return;
 
       switch (e.key) {
         // Page navigation (left/right arrows or A/D)

@@ -83,7 +83,7 @@ export default function FilmsPage() {
           </motion.div>
 
           {/* Album grid */}
-          <AlbumGrid albums={albums} onAlbumClick={handleAlbumClick} />
+          <AlbumGrid albums={albums} onAlbumClick={handleAlbumClick} thumbnailType="horizontal" />
         </>
       ) : (
         <>

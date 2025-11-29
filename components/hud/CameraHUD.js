@@ -14,7 +14,8 @@ import {
   SunIcon,
   BoltIcon,
   AdjustmentsVerticalIcon,
-  CursorArrowRaysIcon
+  CursorArrowRaysIcon,
+  VariableIcon
 } from '@heroicons/react/24/outline';
 import { useApp } from '@/contexts/AppContext';
 import {
@@ -24,7 +25,8 @@ import {
   SHUTTER_SPEEDS,
   WHITE_BALANCE_MODES,
   GRID_TYPES,
-  CURSOR_MODES
+  CURSOR_MODES,
+  LENS_MODES
 } from '@/lib/constants/camera';
 import { cn } from '@/lib/utils/helpers';
 import BatteryIndicator from './BatteryIndicator';
@@ -105,11 +107,19 @@ export default function CameraHUD() {
     updateCameraSetting('cursorMode', nextMode.id);
   };
 
+  const cycleLensMode = () => {
+    const lensOrder = [LENS_MODES.WIDE, LENS_MODES.STANDARD, LENS_MODES.TELEPHOTO, LENS_MODES.MACRO];
+    const currentIndex = lensOrder.indexOf(cameraSettings.lensMode || LENS_MODES.STANDARD);
+    const nextMode = lensOrder[(currentIndex + 1) % lensOrder.length];
+    updateCameraSetting('lensMode', nextMode);
+  };
+
   const currentGridLabel = cameraSettings.grid
     ? GRID_TYPES.find(type => type.id === cameraSettings.grid)?.name || 'Grid'
     : 'Grid';
 
   const currentCursorLabel = CURSOR_MODES.find(mode => mode.id === cameraSettings.cursorMode)?.name || 'Cursor';
+  const currentLensLabel = cameraSettings.lensMode || LENS_MODES.STANDARD;
 
   if (hudMode === HUD_MODES.HIDDEN) {
     return (
@@ -268,6 +278,13 @@ export default function CameraHUD() {
                   onClick={cycleCursorMode}
                   icon={CursorArrowRaysIcon}
                   label={currentCursorLabel}
+                />
+
+                {/* Lens Mode */}
+                <HUDButton
+                  onClick={cycleLensMode}
+                  icon={VariableIcon}
+                  label={`Lens ${currentLensLabel}`}
                 />
               </div>
 

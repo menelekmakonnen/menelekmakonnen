@@ -127,7 +127,7 @@ export function AppProvider({ children }) {
   // Single View navigation
   const openSingleView = useCallback((item) => {
     setSingleViewItem(item);
-    setHudMode(HUD_MODES.HIDDEN); // Auto-hide HUD in Single View
+    setHudMode(HUD_MODES.PARTIAL); // Overlay HUD in Single View but allow hiding
     setAutofocusTrigger(prev => prev + 1);
   }, []);
 

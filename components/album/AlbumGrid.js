@@ -3,7 +3,7 @@ import { useApp } from '@/contexts/AppContext';
 import { cn } from '@/lib/utils/helpers';
 import { LENS_MODES } from '@/lib/constants/camera';
 
-export default function AlbumGrid({ albums, onAlbumClick }) {
+export default function AlbumGrid({ albums, onAlbumClick, thumbnailType = 'square' }) {
   const { cameraSettings } = useApp();
   const lensMode = cameraSettings.lensMode || LENS_MODES.STANDARD;
 
@@ -29,6 +29,7 @@ export default function AlbumGrid({ albums, onAlbumClick }) {
           key={album.id}
           album={album}
           index={index}
+          thumbnailType={thumbnailType}
           onClick={() => onAlbumClick(album)}
         />
       ))}
@@ -36,11 +37,21 @@ export default function AlbumGrid({ albums, onAlbumClick }) {
   );
 }
 
-function AlbumCard({ album, index, onClick }) {
+function AlbumCard({ album, index, onClick, thumbnailType }) {
+  const aspectClass =
+    thumbnailType === 'horizontal'
+      ? 'aspect-video'
+      : thumbnailType === 'vertical'
+        ? 'aspect-[9/16]'
+        : 'aspect-square';
+
   return (
     <motion.button
       onClick={onClick}
-      className="group relative aspect-square overflow-hidden rounded-lg border border-white/10 bg-white/5 backdrop-blur-sm transition-all hover:border-white/30 hover:bg-white/10"
+      className={cn(
+        'group relative overflow-hidden rounded-lg border border-white/10 bg-white/5 backdrop-blur-sm transition-all hover:border-white/30 hover:bg-white/10',
+        aspectClass
+      )}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.05 }}
