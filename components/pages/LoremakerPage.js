@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
-import { MOCK_LOREMAKER_CHARACTERS, getRandomCharacters, filterCharactersWithImages } from '@/lib/data/loremaker';
+import { fetchLoremakerCharacters, getRandomCharacters, filterCharactersWithImages } from '@/lib/data/loremaker';
 import ItemGrid from '../album/ItemGrid';
 import SingleView from '../singleview/SingleView';
 
@@ -10,11 +10,15 @@ export default function LoremakerPage() {
   const [singleViewItem, setSingleViewItem] = useState(null);
 
   useEffect(() => {
-    // In production, fetch from spreadsheet
-    // For now, use mock data and filter/randomize
-    const charactersWithImages = filterCharactersWithImages(MOCK_LOREMAKER_CHARACTERS);
-    const randomCharacters = getRandomCharacters(charactersWithImages, 20);
-    setCharacters(randomCharacters);
+    // Fetch from Google Sheets using Gviz API
+    const loadCharacters = async () => {
+      const allCharacters = await fetchLoremakerCharacters();
+      const charactersWithImages = filterCharactersWithImages(allCharacters);
+      const randomCharacters = getRandomCharacters(charactersWithImages, 20);
+      setCharacters(randomCharacters);
+    };
+
+    loadCharacters();
   }, []);
 
   const handleItemClick = (item) => {
@@ -25,8 +29,9 @@ export default function LoremakerPage() {
     setSingleViewItem(null);
   };
 
-  const handleRefresh = () => {
-    const charactersWithImages = filterCharactersWithImages(MOCK_LOREMAKER_CHARACTERS);
+  const handleRefresh = async () => {
+    const allCharacters = await fetchLoremakerCharacters();
+    const charactersWithImages = filterCharactersWithImages(allCharacters);
     const randomCharacters = getRandomCharacters(charactersWithImages, 20);
     setCharacters(randomCharacters);
   };
