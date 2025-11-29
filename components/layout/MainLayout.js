@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useApp } from '@/contexts/AppContext';
 import { getThemeForTime } from '@/lib/utils/helpers';
@@ -11,6 +11,7 @@ import CameraCursor from '../cursor/CameraCursor';
 import KeyboardHandler from './KeyboardHandler';
 import PowerOffConfirm from '../power/PowerOffConfirm';
 import KeyboardShortcutsHelp from '../overlays/KeyboardShortcutsHelp';
+import { ChevronDoubleDownIcon, ChevronDoubleUpIcon } from '@heroicons/react/24/outline';
 
 export default function MainLayout({ children }) {
   const { singleViewItem, isShuttingDown, easterEggActive } = useApp();
@@ -49,6 +50,8 @@ export default function MainLayout({ children }) {
         >
           {children}
         </main>
+
+        <ScrollShortcuts />
 
         {/* HUD */}
         <CameraHUD />
@@ -125,5 +128,73 @@ function Background({ theme }) {
       {/* Vignette */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
     </motion.div>
+  );
+}
+
+function ScrollShortcuts() {
+  const [showTop, setShowTop] = useState(false);
+  const [showBottom, setShowBottom] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY || window.pageYOffset;
+      const viewportHeight = window.innerHeight || 0;
+      const docHeight = document.documentElement.scrollHeight || 0;
+
+      setShowTop(scrollY > 160);
+      setShowBottom(scrollY + viewportHeight + 160 < docHeight);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, []);
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  const scrollToBottom = () => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+
+  return (
+    <div className="fixed right-4 bottom-28 z-40 flex flex-col items-end gap-2 md:right-6">
+      <AnimatePresence>
+        {showTop && (
+          <motion.button
+            key="back-to-top"
+            onClick={scrollToTop}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/60 text-white shadow-lg backdrop-blur"
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.94 }}
+            aria-label="Back to top"
+          >
+            <ChevronDoubleUpIcon className="h-5 w-5" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showBottom && (
+          <motion.button
+            key="skip-to-bottom"
+            onClick={scrollToBottom}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/60 text-white shadow-lg backdrop-blur"
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.94 }}
+            aria-label="Skip to bottom"
+          >
+            <ChevronDoubleDownIcon className="h-5 w-5" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

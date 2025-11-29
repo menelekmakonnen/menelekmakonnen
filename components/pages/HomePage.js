@@ -76,13 +76,10 @@ export default function HomePage() {
         className="mb-16 text-center"
       >
         <h1 className="mb-4 text-5xl font-bold tracking-tight text-white md:text-6xl">
-          Menelek Makonnen
+          Menelek Makonnen – Filmmaker, Worldbuilder, AI Super-Nerd
         </h1>
-        <p className="mx-auto max-w-2xl text-lg text-white/60">
-          Multidisciplinary creative exploring the intersection of storytelling,
-          technology, and visual artistry. Director, world builder, and AI innovator
-          crafting cinematic narratives, immersive universes, and visual experiences
-          across film, photography, and emerging technologies.
+        <p className="mx-auto max-w-3xl text-lg text-white/70">
+          I build universes, shoot films inside them, then use AI to bend the tools to my will.
         </p>
       </motion.div>
 
@@ -118,12 +115,20 @@ export default function HomePage() {
         <h2 className="mb-4 text-2xl font-bold text-white">
           About Menelek Makonnen
         </h2>
-        <p className="text-white/70">
-          A creative technologist, world builder, and visual storyteller. Bridging the gap
-          between imagination and execution through film, photography, AI, and immersive
-          experiences. Every project is a journey into crafting narratives that resonate
-          across multiple mediums.
-        </p>
+        <div className="space-y-3 text-white/70">
+          <p>
+            I grew up in Ghana devouring Spirou, Tintin and stacks of worn-out Disney comics. By my teens, I was living inside Justice League, Static Shock and every wizarding story I could find. Those worlds trained my imagination; now I design peers that can stand beside them.
+          </p>
+          <p>
+            I’m a filmmaker, creative director and universe-builder between London and Accra. I don’t do knockoffs or “the African version of” anything. I build original fantasy, superhero and supernatural sagas with the depth to sit on the same shelf as Tolkien, GRRM and the MCU.
+          </p>
+          <p>
+            My work lives in three pillars: LORE—the living universe blueprint; FILM & VIDEO—short films, music videos and cinematic reels; AI & VISUALS—photography and AI-driven concept art polished like premium storyboards.
+          </p>
+          <p>
+            Think of this site as a private showroom: high-gloss, invitation-only energy. Reality and fantasy blur here on purpose. If you’re a studio, brand or fearless collaborator, take a tour, get obsessed, then call when you’re ready to build something iconic together.
+          </p>
+        </div>
       </motion.div>
 
       {/* Navigation Hint */}

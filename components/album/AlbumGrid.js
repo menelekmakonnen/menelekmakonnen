@@ -65,6 +65,8 @@ function AlbumCard({ album, index, onClick, thumbnailType }) {
             src={album.thumbnail}
             alt={album.title || album.name}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            loading="lazy"
+            decoding="async"
           />
           {/* Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />

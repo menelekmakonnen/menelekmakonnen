@@ -1,120 +1,51 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { SparklesIcon } from '@heroicons/react/24/outline';
-import { MOCK_AI_ALBUMS } from '@/lib/data/googleDrive';
-import AlbumGrid from '../album/AlbumGrid';
-import ItemGrid from '../album/ItemGrid';
-import SingleView from '../singleview/SingleView';
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { AI_ALBUMS_DRIVE_FOLDER } from '@/lib/data/googleDrive';
 
 export default function AIAlbumsPage() {
-  const [selectedAlbum, setSelectedAlbum] = useState(null);
-  const [singleViewItem, setSingleViewItem] = useState(null);
-
-  // In production, fetch from Google Drive
-  const albums = MOCK_AI_ALBUMS;
-
-  const handleAlbumClick = (album) => {
-    setSelectedAlbum(album);
-  };
-
-  const handleItemClick = (item) => {
-    setSingleViewItem(item);
-  };
-
-  const handleBack = () => {
-    if (singleViewItem) {
-      setSingleViewItem(null);
-    } else if (selectedAlbum) {
-      setSelectedAlbum(null);
-    }
-  };
+  const embedUrl = `https://drive.google.com/embeddedfolderview?id=${AI_ALBUMS_DRIVE_FOLDER}#grid`;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
-      {!selectedAlbum ? (
-        <>
-          {/* Page header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <h1 className="text-4xl font-bold text-white">
-              AI Albums
-            </h1>
-            <p className="mt-2 text-white/60">
-              AI-generated visual explorations
-            </p>
-          </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8"
+      >
+        <h1 className="text-4xl font-bold text-white">
+          AI Imagery – Concept Art from the Future
+        </h1>
+        <div className="mt-2 space-y-2 text-white/70">
+          <p>
+            AI is not here to replace artists. It’s here to expose who actually has ideas. I use it like directors use pre-vis:
+            to prototype universes, characters, locations and moods before we spend real money and days on set.
+          </p>
+          <p>
+            Inside these albums you’ll see concept art for heroes, gods, villains and cities that haven’t reached the screen yet—visual experiments where African aesthetics collide with sci-fi, supernatural horror, romance and surrealism.
+            If your company is still arguing about whether AI is “allowed,” you’re already behind. I’m more interested in what we can build with it.
+          </p>
+        </div>
+      </motion.div>
 
-          {/* Coming Soon Notice */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="rounded-lg border border-green-500/30 bg-green-500/10 p-8 text-center"
-          >
-            <SparklesIcon className="mx-auto mb-4 h-16 w-16 text-green-400" />
-            <h3 className="mb-2 text-xl font-semibold text-green-400">
-              AI Album Integration Coming Soon
-            </h3>
-            <p className="text-white/60">
-              AI-generated image albums will be populated from Google Drive.
-              This feature is currently in development.
-            </p>
-          </motion.div>
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-lg">
+        <iframe
+          title="AI albums (Google Drive)"
+          src={embedUrl}
+          className="h-[70vh] w-full"
+          allowFullScreen
+          sandbox="allow-same-origin allow-scripts"
+          loading="lazy"
+        />
+      </div>
 
-          {/* Placeholder album grid */}
-          {albums.length > 0 && (
-            <div className="mt-8">
-              <AlbumGrid albums={albums} onAlbumClick={handleAlbumClick} />
-            </div>
-          )}
-        </>
-      ) : (
-        <>
-          {/* Album view */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <button
-              onClick={handleBack}
-              className="mb-4 text-sm text-white/60 transition-colors hover:text-white"
-            >
-              ← Back to Albums
-            </button>
-
-            <h2 className="text-3xl font-bold text-white">
-              {selectedAlbum.name}
-            </h2>
-            {selectedAlbum.description && (
-              <p className="mt-2 text-white/60">
-                {selectedAlbum.description}
-              </p>
-            )}
-          </motion.div>
-
-          {/* Images would go here */}
-          <div className="rounded-lg border border-white/10 bg-white/5 p-12 text-center text-white/60">
-            AI-generated images from Google Drive will appear here
-          </div>
-        </>
-      )}
-
-      {/* Single View */}
-      <AnimatePresence>
-        {singleViewItem && selectedAlbum && (
-          <SingleView
-            item={singleViewItem}
-            items={selectedAlbum.images || []}
-            albums={albums}
-            currentAlbumId={selectedAlbum.id}
-            onClose={() => setSingleViewItem(null)}
-          />
-        )}
-      </AnimatePresence>
+      <div className="mt-4 flex flex-wrap gap-4 text-sm text-white/70">
+        <Link
+          href={`/drive/${AI_ALBUMS_DRIVE_FOLDER}`}
+          className="rounded-full border border-white/10 px-4 py-2 transition hover:border-white/30 hover:text-white"
+        >
+          Open expanded view
+        </Link>
+      </div>
     </div>
   );
 }

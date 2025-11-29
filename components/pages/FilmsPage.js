@@ -55,11 +55,18 @@ export default function FilmsPage() {
             <div className="flex items-end justify-between">
               <div>
                 <h1 className="text-4xl font-bold text-white">
-                  Films & Music Videos
+                  Films & Music Videos – Where the Lore Hits the Lens
                 </h1>
-                <p className="mt-2 text-white/60">
-                  Cinematic storytelling and visual narratives
-                </p>
+                <div className="mt-2 space-y-2 text-white/70">
+                  <p>
+                    I don’t shoot “content.” I shoot evidence that these worlds are real. Grounded emotional arcs, supernatural stakes, and colour-rich cinematography collide here.
+                    The influences are obvious if you look—Breaking Bad tension, Game of Thrones stakes, early MCU structure—but the flavour is unapologetically mine.
+                  </p>
+                  <p>
+                    For artists and labels, music videos become mini-pilots for a bigger universe: high-energy visuals, story-driven concepts, and rewatchable craft.
+                    If you need a Ghanaian / London-based director who can plug your song, script or concept into a larger mythos, start here.
+                  </p>
+                </div>
               </div>
 
               {/* View All button */}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useApp } from '@/contexts/AppContext';
 import { cn, shuffle } from '@/lib/utils/helpers';
@@ -16,7 +16,7 @@ const SORT_OPTIONS = {
   ZA: 'z-a'
 };
 
-export default function ItemGrid({ items, onItemClick, type = 'vertical' }) {
+export default function ItemGrid({ items, onItemClick, type = 'vertical', descriptionOnHover = false }) {
   const { cameraSettings } = useApp();
   const [sortMode, setSortMode] = useState(SORT_OPTIONS.RANDOM);
   const [sortedItems, setSortedItems] = useState(items);
@@ -86,6 +86,12 @@ export default function ItemGrid({ items, onItemClick, type = 'vertical' }) {
     setSortedItems(sorted);
   };
 
+  // Keep sorted items in sync when the source list changes
+  useEffect(() => {
+    setSortedItems(shuffle(items));
+    setSortMode(SORT_OPTIONS.RANDOM);
+  }, [items]);
+
   return (
     <div>
       {/* Sort Controls */}
@@ -119,6 +125,7 @@ export default function ItemGrid({ items, onItemClick, type = 'vertical' }) {
             item={item}
             index={index}
             type={type}
+            descriptionOnHover={descriptionOnHover}
             onClick={() => onItemClick(item, index)}
           />
         ))}
@@ -146,7 +153,7 @@ function SortButton({ icon: Icon, label, active, onClick }) {
   );
 }
 
-function ItemCard({ item, index, type, onClick }) {
+function ItemCard({ item, index, type, onClick, descriptionOnHover }) {
   // Determine aspect ratio based on content type
   const aspectRatio =
     type === 'horizontal' ? 'aspect-video' :   // 16:9 for films/YouTube
@@ -162,9 +169,12 @@ function ItemCard({ item, index, type, onClick }) {
       return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
     }
     if (item.instagramUrl || item.embedCode) {
-      const code = item.embedCode || item.instagramUrl?.split('/p/')[1]?.split('/')?.[0] || '';
+      const code = item.embedCode
+        || item.instagramUrl?.split('/')?.filter(Boolean)?.pop()?.replace(/\?.*$/, '')
+        || '';
+      const pathType = item.instagramUrl?.includes('/reel/') ? 'reel' : 'p';
       if (code) {
-        return `https://www.instagram.com/p/${code}/media/?size=l`;
+        return `https://www.instagram.com/${pathType}/${code}/media/?size=l`;
       }
     }
     return null;
@@ -193,6 +203,7 @@ function ItemCard({ item, index, type, onClick }) {
             alt={item.title || item.name || item.character}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
             loading="lazy"
+            decoding="async"
           />
           {/* Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
@@ -210,10 +221,22 @@ function ItemCard({ item, index, type, onClick }) {
 
       {/* Content overlay */}
       {(item.title || item.name || item.character) && (
-        <div className="absolute inset-x-0 bottom-0 p-3 opacity-0 transition-opacity group-hover:opacity-100">
-          <p className="text-left text-sm font-semibold text-white drop-shadow-lg">
-            {item.title || item.name || item.character}
-          </p>
+        <div className="absolute inset-x-0 bottom-0 p-3">
+          <div className="rounded-lg bg-black/60 p-2 backdrop-blur-sm transition-all duration-300 group-hover:bg-black/80">
+            <p className="text-left text-sm font-semibold text-white drop-shadow-lg">
+              {item.title || item.name || item.character}
+            </p>
+            {item.description && (
+              <p
+                className={cn(
+                  'mt-1 text-left text-xs text-white/70 transition-opacity duration-300',
+                  descriptionOnHover ? 'opacity-0 group-hover:opacity-100' : 'opacity-60 group-hover:opacity-100'
+                )}
+              >
+                {item.description}
+              </p>
+            )}
+          </div>
         </div>
       )}
 

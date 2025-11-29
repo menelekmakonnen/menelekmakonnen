@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils/helpers';
 
 export default function Header() {
   const { currentPage, navigateToPage, easterEggActive, setEasterEggActive } = useApp();
+  const currentTitle = PAGE_TITLES[currentPage];
 
   const pageIcons = {
     [PAGES.HOME]: HomeIcon,
@@ -29,7 +30,7 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-40 border-b border-white/10 bg-black/50 backdrop-blur-xl">
-      <div className="mx-auto max-w-7xl px-4 py-4">
+      <div className="relative mx-auto max-w-7xl px-4 py-4">
         <div className="grid grid-cols-3 items-center">
           {/* Navigation Icons */}
           <nav className="flex items-center gap-2 md:gap-4">
@@ -63,6 +64,15 @@ export default function Header() {
             onToggle={() => setEasterEggActive(prev => !prev)}
           />
         </div>
+
+        <motion.button
+          onClick={() => navigateToPage(currentPage)}
+          className="pointer-events-auto absolute left-1/2 top-full mt-2 -translate-x-1/2 rounded-full border border-white/20 bg-white/5 px-4 py-1 text-xs font-semibold text-white shadow-lg backdrop-blur-sm"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          {currentTitle}
+        </motion.button>
       </div>
     </header>
   );

@@ -101,7 +101,7 @@ function PageBadge({ currentPage }) {
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="pointer-events-none fixed left-1/2 top-4 z-30 -translate-x-1/2 space-y-2 text-center font-mono text-xs text-white/80"
+      className="pointer-events-none fixed right-6 top-24 z-30 space-y-2 text-right font-mono text-xs text-white/80 md:right-10 md:top-28"
     >
       <div className="inline-flex rounded border border-emerald-400/30 bg-black/60 px-3 py-1 text-emerald-200 backdrop-blur-sm">
         {PAGE_DISPLAY_NAMES[currentPage] || 'UNKNOWN'}

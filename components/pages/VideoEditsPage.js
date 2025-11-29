@@ -40,11 +40,16 @@ export default function VideoEditsPage() {
             <div className="flex items-end justify-between">
               <div>
                 <h1 className="text-4xl font-bold text-white">
-                  Video Edits
+                  Video Edits – Thumb-Stopping Chaos, Precision-Built
                 </h1>
-                <p className="mt-2 text-white/60">
-                  Epic edits, beauty, behind the scenes, and AI & learning content
-                </p>
+                <div className="mt-2 space-y-2 text-white/70">
+                  <p>
+                    These aren’t random reels thrown at the algorithm. They’re short-form experiments in pacing, rhythm and emotional punch—epic edits, beauty & travel, behind the scenes, and AI & learning.
+                  </p>
+                  <p>
+                    Built to grab attention in under a second, deliver a feeling, and leave a trace of story. If your brand, song or story needs cinematic short-form that respects audience intelligence, we should talk.
+                  </p>
+                </div>
               </div>
 
               {/* View All button */}

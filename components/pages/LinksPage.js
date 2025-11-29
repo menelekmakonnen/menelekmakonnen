@@ -31,9 +31,14 @@ export default function LinksPage() {
         <h1 className="text-4xl font-bold text-white">
           Links & Contact
         </h1>
-        <p className="mt-2 text-white/60">
-          Connect across all platforms
-        </p>
+        <div className="mt-3 space-y-2 text-white/70">
+          <p>
+            If you’ve made it this far, you’re either dangerously curious or exactly my kind of collaborator. I’m based between London and Accra, operating as a filmmaker, creative director, worldbuilder and AI consultant.
+          </p>
+          <p>
+            Send the script, the brief, the budget, the wild idea that everyone else told you to “tone down.” I don’t do “tone down.” I do “let’s make it bigger, smarter and impossible to ignore.”
+          </p>
+        </div>
       </motion.div>
 
       {/* Personal Links */}
