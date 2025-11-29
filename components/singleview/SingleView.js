@@ -23,13 +23,33 @@ export default function SingleView({ item, items, albums = [], currentAlbumId, o
     cameraSettings
   } = useApp();
 
+  const [albumItems, setAlbumItems] = useState(items);
   const [currentIndex, setCurrentIndex] = useState(
-    items.findIndex(i => i.id === item.id)
+    Math.max(0, items.findIndex(i => i.id === item.id))
   );
-  const [selectedAlbumId, setSelectedAlbumId] = useState(currentAlbumId);
+  const [selectedAlbumId, setSelectedAlbumId] = useState(currentAlbumId || albums[0]?.id);
   const [slideshowInterval, setSlideshowInterval] = useState(3000);
 
-  const currentItem = items[currentIndex];
+  const currentItem = albumItems[currentIndex] || albumItems[0] || item;
+
+  useEffect(() => {
+    setAlbumItems(items);
+    setCurrentIndex(Math.max(0, items.findIndex(i => i.id === item.id)));
+  }, [items, item.id]);
+
+  useEffect(() => {
+    if (!selectedAlbumId) return;
+    const nextAlbum = albums.find(a => a.id === selectedAlbumId);
+    if (nextAlbum?.items) {
+      setAlbumItems(nextAlbum.items);
+      setCurrentIndex(0);
+    }
+  }, [albums, selectedAlbumId]);
+
+  useEffect(() => {
+    if (albumItems.length === 0) return;
+    setCurrentIndex(prev => Math.min(prev, albumItems.length - 1));
+  }, [albumItems.length]);
 
   // Slideshow timer
   useEffect(() => {
@@ -40,7 +60,7 @@ export default function SingleView({ item, items, albums = [], currentAlbumId, o
     }, slideshowInterval);
 
     return () => clearInterval(timer);
-  }, [isSlideshowActive, slideshowInterval, currentIndex]);
+  }, [isSlideshowActive, slideshowInterval, currentIndex, albumItems.length]);
 
   // Keyboard navigation (W/S for items, A/D for albums)
   useEffect(() => {
@@ -84,12 +104,14 @@ export default function SingleView({ item, items, albums = [], currentAlbumId, o
   }, [currentIndex, selectedAlbumId, albums]);
 
   const handlePrevious = useCallback(() => {
-    setCurrentIndex(prev => (prev > 0 ? prev - 1 : items.length - 1));
-  }, [items.length]);
+    if (!albumItems.length) return;
+    setCurrentIndex(prev => (prev > 0 ? prev - 1 : albumItems.length - 1));
+  }, [albumItems.length]);
 
   const handleNext = useCallback(() => {
-    setCurrentIndex(prev => (prev < items.length - 1 ? prev + 1 : 0));
-  }, [items.length]);
+    if (!albumItems.length) return;
+    setCurrentIndex(prev => (prev < albumItems.length - 1 ? prev + 1 : 0));
+  }, [albumItems.length]);
 
   // HUD visibility rules for Single View vs Expanded
   useEffect(() => {
@@ -102,7 +124,6 @@ export default function SingleView({ item, items, albums = [], currentAlbumId, o
     const currentAlbumIndex = albums.findIndex(a => a.id === selectedAlbumId);
     const prevIndex = currentAlbumIndex > 0 ? currentAlbumIndex - 1 : albums.length - 1;
     setSelectedAlbumId(albums[prevIndex].id);
-    setCurrentIndex(0); // Go to first item of new album
   }, [albums, selectedAlbumId]);
 
   const handleNextAlbum = useCallback(() => {
@@ -110,7 +131,6 @@ export default function SingleView({ item, items, albums = [], currentAlbumId, o
     const currentAlbumIndex = albums.findIndex(a => a.id === selectedAlbumId);
     const nextIndex = currentAlbumIndex < albums.length - 1 ? currentAlbumIndex + 1 : 0;
     setSelectedAlbumId(albums[nextIndex].id);
-    setCurrentIndex(0);
   }, [albums, selectedAlbumId]);
 
   return (
@@ -183,7 +203,7 @@ export default function SingleView({ item, items, albums = [], currentAlbumId, o
         {/* Right sidebar (thumbnails) */}
         {!isSingleViewExpanded && (
           <Sidebar
-            items={items}
+            items={albumItems}
             currentIndex={currentIndex}
             onItemClick={setCurrentIndex}
           />

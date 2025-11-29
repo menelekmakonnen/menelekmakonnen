@@ -15,7 +15,8 @@ import {
   BoltIcon,
   AdjustmentsVerticalIcon,
   CursorArrowRaysIcon,
-  VariableIcon
+  VariableIcon,
+  PhotoIcon
 } from '@heroicons/react/24/outline';
 import { useApp } from '@/contexts/AppContext';
 import {
@@ -283,7 +284,7 @@ export default function CameraHUD() {
                 {/* Lens Mode */}
                 <HUDButton
                   onClick={cycleLensMode}
-                  icon={VariableIcon}
+                  icon={PhotoIcon}
                   label={`Lens ${currentLensLabel}`}
                 />
               </div>

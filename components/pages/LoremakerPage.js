@@ -1,14 +1,42 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
-import { fetchLoremakerCharacters, getRandomCharacters, filterCharactersWithImages } from '@/lib/data/loremaker';
-import { getDriveImageUrl } from '@/lib/data/googleDrive';
 import ItemGrid from '../album/ItemGrid';
 import SingleView from '../singleview/SingleView';
+import { fetchLoremakerCharacters, getRandomCharacters, filterCharactersWithImages } from '@/lib/data/loremaker';
+import { getDriveImageUrl } from '@/lib/data/googleDrive';
+
+const CTA_CARD = {
+  id: 'loremaker-cta',
+  character: 'Enter the Universe',
+  alias: 'Loremaker',
+  shortDescription: 'See every character and arc on loremaker.cloud',
+  coverImage: '',
+  galleryImages: [],
+  cta: true,
+  thumbnail: '/images/loremaker-blur.svg',
+  name: 'Enter the Universe',
+  description: 'See every character and arc on loremaker.cloud'
+};
 
 export default function LoremakerPage() {
   const [characters, setCharacters] = useState([]);
   const [singleViewItem, setSingleViewItem] = useState(null);
+  const [isPreloading, setIsPreloading] = useState(true);
+
+  const preloadImages = async (urls = []) => {
+    const uniqueUrls = [...new Set(urls.filter(Boolean))];
+    await Promise.all(
+      uniqueUrls.map(src =>
+        new Promise(resolve => {
+          const img = new Image();
+          img.onload = () => resolve();
+          img.onerror = () => resolve();
+          img.src = src;
+        })
+      )
+    );
+  };
 
   useEffect(() => {
     // Fetch from Google Sheets using Gviz API
@@ -16,16 +44,21 @@ export default function LoremakerPage() {
       const allCharacters = await fetchLoremakerCharacters();
       const charactersWithImages = filterCharactersWithImages(allCharacters);
       const randomCharacters = getRandomCharacters(charactersWithImages, 20);
-      const blurredCta = {
-        id: 'loremaker-cta',
-        character: 'Enter the Universe',
-        alias: 'Loremaker',
-        shortDescription: 'See every character and arc on loremaker.cloud',
-        coverImage: '',
-        galleryImages: [],
-        cta: true
-      };
-      setCharacters([...randomCharacters, blurredCta]);
+      const hydrated = randomCharacters.map(char => ({
+        ...char,
+        id: char.character,
+        name: char.character,
+        thumbnail: char.cta
+          ? '/images/loremaker-blur.svg'
+          : getDriveImageUrl(char.coverImage) || getDriveImageUrl(char.galleryImages[0]) || char.coverImage || char.galleryImages[0],
+        description: char.shortDescription
+      }));
+
+      // Preload hero thumbnails so they are ready when rendered
+      await preloadImages(hydrated.map(char => char.thumbnail));
+
+      setCharacters([...hydrated, CTA_CARD]);
+      setIsPreloading(false);
     };
 
     loadCharacters();
@@ -44,10 +77,22 @@ export default function LoremakerPage() {
   };
 
   const handleRefresh = async () => {
+    setIsPreloading(true);
     const allCharacters = await fetchLoremakerCharacters();
     const charactersWithImages = filterCharactersWithImages(allCharacters);
     const randomCharacters = getRandomCharacters(charactersWithImages, 20);
-    setCharacters(randomCharacters);
+    const hydrated = randomCharacters.map(char => ({
+      ...char,
+      id: char.character,
+      name: char.character,
+      thumbnail: char.cta
+        ? '/images/loremaker-blur.svg'
+        : getDriveImageUrl(char.coverImage) || getDriveImageUrl(char.galleryImages[0]) || char.coverImage || char.galleryImages[0],
+      description: char.shortDescription
+    }));
+    await preloadImages(hydrated.map(char => char.thumbnail));
+    setCharacters([...hydrated, CTA_CARD]);
+    setIsPreloading(false);
   };
 
   return (
@@ -93,17 +138,13 @@ export default function LoremakerPage() {
       </motion.div>
 
       {/* Character grid */}
-      {characters.length > 0 ? (
+      {isPreloading ? (
+        <div className="flex min-h-[320px] items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/60">
+          Preparing characters...
+        </div>
+      ) : characters.length > 0 ? (
         <ItemGrid
-          items={characters.map(char => ({
-            ...char,
-            id: char.character,
-            name: char.character,
-            thumbnail: char.cta
-              ? '/images/loremaker-blur.svg'
-              : getDriveImageUrl(char.coverImage) || getDriveImageUrl(char.galleryImages[0]) || char.coverImage || char.galleryImages[0],
-            description: char.shortDescription
-          }))}
+          items={characters}
           onItemClick={handleItemClick}
           type="vertical"
         />
@@ -133,6 +174,7 @@ export default function LoremakerPage() {
             character={singleViewItem}
             characters={characters}
             onClose={handleCloseSingleView}
+            onSelectCharacter={setSingleViewItem}
           />
         )}
       </AnimatePresence>
@@ -140,8 +182,14 @@ export default function LoremakerPage() {
   );
 }
 
-function CharacterSingleView({ character, characters, onClose }) {
+function CharacterSingleView({ character, characters, onClose, onSelectCharacter }) {
   const suggested = characters.filter(c => c.id !== character.id && !c.cta).sort(() => 0.5 - Math.random()).slice(0, 4);
+  const galleryImages = [character.coverImage, ...(character.galleryImages || [])].filter(Boolean);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  useEffect(() => {
+    setActiveImageIndex(0);
+  }, [character.id]);
 
   return (
     <motion.div
@@ -163,14 +211,47 @@ function CharacterSingleView({ character, characters, onClose }) {
           </button>
 
       {/* Character content */}
-      <div className="grid gap-8 md:grid-cols-2">
+        <div className="grid gap-8 md:grid-cols-2">
         {/* Image */}
         <div className="relative aspect-square overflow-hidden rounded-lg">
               <img
-                src={getDriveImageUrl(character.coverImage) || getDriveImageUrl(character.galleryImages?.[0]) || character.coverImage || character.galleryImages?.[0]}
+                src={getDriveImageUrl(galleryImages[activeImageIndex]) || galleryImages[activeImageIndex]}
                 alt={character.character}
                 className="h-full w-full object-cover"
               />
+
+              {galleryImages.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setActiveImageIndex(prev => (prev > 0 ? prev - 1 : galleryImages.length - 1))}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-black/50 p-2 text-white transition-all hover:bg-white/10"
+                  >
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => setActiveImageIndex(prev => (prev < galleryImages.length - 1 ? prev + 1 : 0))}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-black/50 p-2 text-white transition-all hover:bg-white/10"
+                  >
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </>
+              )}
+
+              {galleryImages.length > 1 && (
+                <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-2 rounded-full bg-black/50 px-3 py-1 text-xs text-white/80 backdrop-blur-sm">
+                  {galleryImages.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveImageIndex(idx)}
+                      className={`h-2 w-2 rounded-full ${idx === activeImageIndex ? 'bg-white' : 'bg-white/40'}`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Details */}
@@ -256,7 +337,13 @@ function CharacterSingleView({ character, characters, onClose }) {
               <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-white/50">Other characters</h3>
               <div className="grid grid-cols-2 gap-3">
                 {suggested.map(other => (
-                  <div key={other.id} className="rounded-lg border border-white/10 bg-white/5 p-2 text-white/80">
+                  <motion.button
+                    key={other.id}
+                    onClick={() => onSelectCharacter(other)}
+                    className="rounded-lg border border-white/10 bg-white/5 p-2 text-white/80 text-left transition-colors hover:border-white/40 hover:bg-white/10"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
                     <div className="aspect-video overflow-hidden rounded-md">
                       <img
                         src={getDriveImageUrl(other.coverImage) || getDriveImageUrl(other.galleryImages?.[0]) || other.coverImage || other.galleryImages?.[0]}
@@ -265,10 +352,7 @@ function CharacterSingleView({ character, characters, onClose }) {
                       />
                     </div>
                     <p className="mt-2 text-sm font-semibold">{other.character}</p>
-                    {other.shortDescription && (
-                      <p className="text-xs text-white/60">{other.shortDescription}</p>
-                    )}
-                  </div>
+                  </motion.button>
                 ))}
               </div>
             </div>

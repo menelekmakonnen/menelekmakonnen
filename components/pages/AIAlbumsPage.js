@@ -47,29 +47,25 @@ export default function AIAlbumsPage() {
             </p>
           </motion.div>
 
-          {/* Coming Soon Notice */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="rounded-lg border border-green-500/30 bg-green-500/10 p-8 text-center"
+            className="mb-8 rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-left text-sm text-white/70"
           >
-            <SparklesIcon className="mx-auto mb-4 h-16 w-16 text-green-400" />
-            <h3 className="mb-2 text-xl font-semibold text-green-400">
-              AI Album Integration Coming Soon
-            </h3>
-            <p className="text-white/60">
-              AI-generated image albums will be populated from Google Drive.
-              This feature is currently in development.
+            <p className="flex items-center gap-2 font-semibold text-green-200">
+              <SparklesIcon className="h-5 w-5" />
+              Drive-ready placeholders
             </p>
+            <p className="mt-2">Replace the URLs in <code>lib/data/googleDrive.js</code> with your Drive thumbnails to wire up the live feed.</p>
           </motion.div>
 
-          {/* Placeholder album grid */}
-          {albums.length > 0 && (
-            <div className="mt-8">
-              <AlbumGrid albums={albums} onAlbumClick={handleAlbumClick} />
-            </div>
-          )}
+          {/* Album grid */}
+          <AlbumGrid
+            albums={albums.map(album => ({ ...album, title: album.name }))}
+            onAlbumClick={handleAlbumClick}
+            thumbnailType="vertical"
+          />
         </>
       ) : (
         <>
@@ -96,10 +92,17 @@ export default function AIAlbumsPage() {
             )}
           </motion.div>
 
-          {/* Images would go here */}
-          <div className="rounded-lg border border-white/10 bg-white/5 p-12 text-center text-white/60">
-            AI-generated images from Google Drive will appear here
-          </div>
+          <ItemGrid
+            items={selectedAlbum.images?.map(image => ({
+              ...image,
+              id: image.id,
+              title: image.title,
+              thumbnail: image.url,
+              coverImage: image.url
+            })) || []}
+            onItemClick={handleItemClick}
+            type="vertical"
+          />
         </>
       )}
 
@@ -108,8 +111,23 @@ export default function AIAlbumsPage() {
         {singleViewItem && selectedAlbum && (
           <SingleView
             item={singleViewItem}
-            items={selectedAlbum.images || []}
-            albums={albums}
+            items={selectedAlbum.images?.map(image => ({
+              ...image,
+              id: image.id,
+              title: image.title,
+              thumbnail: image.url,
+              coverImage: image.url
+            })) || []}
+            albums={albums.map(album => ({
+              ...album,
+              items: album.images?.map(image => ({
+                ...image,
+                id: image.id,
+                title: image.title,
+                thumbnail: image.url,
+                coverImage: image.url
+              })) || []
+            }))}
             currentAlbumId={selectedAlbum.id}
             onClose={() => setSingleViewItem(null)}
           />

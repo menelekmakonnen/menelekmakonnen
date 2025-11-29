@@ -162,9 +162,12 @@ function ItemCard({ item, index, type, onClick }) {
       return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
     }
     if (item.instagramUrl || item.embedCode) {
-      const code = item.embedCode || item.instagramUrl?.split('/p/')[1]?.split('/')?.[0] || '';
+      const code = item.embedCode
+        || item.instagramUrl?.split('/')?.filter(Boolean)?.pop()?.replace(/\?.*$/, '')
+        || '';
+      const pathType = item.instagramUrl?.includes('/reel/') ? 'reel' : 'p';
       if (code) {
-        return `https://www.instagram.com/p/${code}/media/?size=l`;
+        return `https://www.instagram.com/${pathType}/${code}/media/?size=l`;
       }
     }
     return null;
@@ -210,10 +213,17 @@ function ItemCard({ item, index, type, onClick }) {
 
       {/* Content overlay */}
       {(item.title || item.name || item.character) && (
-        <div className="absolute inset-x-0 bottom-0 p-3 opacity-0 transition-opacity group-hover:opacity-100">
-          <p className="text-left text-sm font-semibold text-white drop-shadow-lg">
-            {item.title || item.name || item.character}
-          </p>
+        <div className="absolute inset-x-0 bottom-0 p-3">
+          <div className="rounded-lg bg-black/60 p-2 backdrop-blur-sm transition-all duration-300 group-hover:bg-black/80">
+            <p className="text-left text-sm font-semibold text-white drop-shadow-lg">
+              {item.title || item.name || item.character}
+            </p>
+            {item.description && (
+              <p className="mt-1 text-left text-xs text-white/70 transition-opacity duration-300 group-hover:opacity-100 opacity-60">
+                {item.description}
+              </p>
+            )}
+          </div>
         </div>
       )}
 

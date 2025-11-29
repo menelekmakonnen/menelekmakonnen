@@ -11,22 +11,20 @@ export default function PhotographyPage() {
   const [selectedAlbum, setSelectedAlbum] = useState(null);
   const [singleViewItem, setSingleViewItem] = useState(null);
 
-  // In production, fetch from Google Drive
-  // For now, use mock structure
-  const categories = [
-    {
-      id: 'beauty',
-      title: 'Beauty',
-      description: 'Beauty and portrait photoshoots',
-      thumbnail: null
-    },
-    {
-      id: 'professional',
-      title: 'Professional',
-      description: 'Events and professional photography',
-      thumbnail: null
-    }
-  ];
+  const albums = MOCK_PHOTOGRAPHY_ALBUMS;
+  const categories = Array.from(
+    new Map(
+      albums.map(album => [
+        album.category,
+        {
+          id: album.category.toLowerCase(),
+          title: album.category,
+          description: `${album.category} galleries from recent shoots`,
+          thumbnail: album.thumbnail
+        }
+      ])
+    ).values()
+  );
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
@@ -70,23 +68,6 @@ export default function PhotographyPage() {
 
           {/* Category grid */}
           <AlbumGrid albums={categories} onAlbumClick={handleCategoryClick} />
-
-          {/* Coming Soon Notice */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mt-8 rounded-lg border border-blue-500/30 bg-blue-500/10 p-6 text-center"
-          >
-            <FolderIcon className="mx-auto mb-4 h-12 w-12 text-blue-400" />
-            <h3 className="mb-2 text-lg font-semibold text-blue-400">
-              Gallery Integration Coming Soon
-            </h3>
-            <p className="text-sm text-white/60">
-              Photography albums will be populated from Google Drive.
-              This feature is currently in development.
-            </p>
-          </motion.div>
         </>
       ) : selectedCategory && !selectedAlbum ? (
         <>
@@ -111,10 +92,45 @@ export default function PhotographyPage() {
             </p>
           </motion.div>
 
-          {/* Albums would go here */}
-          <div className="rounded-lg border border-white/10 bg-white/5 p-12 text-center text-white/60">
-            Albums from Google Drive will appear here
-          </div>
+          <AlbumGrid
+            albums={albums.filter(album => album.category.toLowerCase() === selectedCategory.id).map(album => ({
+              ...album,
+              title: album.name
+            }))}
+            onAlbumClick={handleAlbumClick}
+            thumbnailType="vertical"
+          />
+        </>
+      ) : selectedAlbum ? (
+        <>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
+          >
+            <button
+              onClick={handleBack}
+              className="mb-4 text-sm text-white/60 transition-colors hover:text-white"
+            >
+              ← Back to {selectedCategory?.title || 'albums'}
+            </button>
+
+            <h2 className="text-3xl font-bold text-white">{selectedAlbum.name}</h2>
+            <p className="mt-2 text-white/60">{selectedAlbum.date}</p>
+          </motion.div>
+
+          <ItemGrid
+            items={selectedAlbum.images?.map(image => ({
+              ...image,
+              id: image.id,
+              title: image.title,
+              thumbnail: image.url,
+              coverImage: image.url,
+              description: selectedAlbum.name
+            })) || []}
+            onItemClick={handleItemClick}
+            type="vertical"
+          />
         </>
       ) : null}
 
@@ -123,8 +139,24 @@ export default function PhotographyPage() {
         {singleViewItem && selectedAlbum && (
           <SingleView
             item={singleViewItem}
-            items={selectedAlbum.images || []}
-            albums={[selectedAlbum]}
+            items={selectedAlbum.images?.map(image => ({
+              ...image,
+              id: image.id,
+              title: image.title,
+              thumbnail: image.url,
+              coverImage: image.url
+            })) || []}
+            albums={albums.filter(album => album.category.toLowerCase() === selectedCategory.id).map(album => ({
+              ...album,
+              id: album.id,
+              items: album.images?.map(image => ({
+                ...image,
+                id: image.id,
+                title: image.title,
+                thumbnail: image.url,
+                coverImage: image.url
+              })) || []
+            }))}
             currentAlbumId={selectedAlbum.id}
             onClose={() => setSingleViewItem(null)}
           />
