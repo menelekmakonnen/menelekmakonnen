@@ -2,4 +2,84 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Add global styles here */
+:root {
+  --glow: rgba(126, 196, 255, 0.22);
+  --glass: rgba(15, 23, 42, 0.55);
+  --grid: rgba(255, 255, 255, 0.06);
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  @apply min-h-screen bg-slate-950 text-slate-100 antialiased;
+}
+
+body {
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.04), transparent 40%),
+    radial-gradient(circle at 80% 30%, rgba(126, 196, 255, 0.12), transparent 45%),
+    radial-gradient(circle at 50% 80%, rgba(255, 176, 96, 0.12), transparent 40%),
+    linear-gradient(135deg, #0b0f1c, #060910 60%);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  cursor: crosshair;
+  user-select: none;
+}
+
+a {
+  @apply text-cyan-300 underline-offset-4 hover:text-cyan-200;
+}
+
+.glass-panel {
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.grid-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 80px 80px;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(16, 185, 129, 0.9));
+  border-radius: 12px;
+  border: 2px solid rgba(0, 0, 0, 0.35);
+}
+
+.focus-reticle {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.06);
+}
+
+.video-shell {
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05), transparent 55%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
