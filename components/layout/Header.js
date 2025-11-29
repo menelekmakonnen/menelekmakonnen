@@ -15,7 +15,7 @@ import { PAGES, PAGE_TITLES } from '@/lib/constants/pages';
 import { cn } from '@/lib/utils/helpers';
 
 export default function Header() {
-  const { currentPage, navigateToPage } = useApp();
+  const { currentPage, navigateToPage, easterEggActive, setEasterEggActive } = useApp();
 
   const pageIcons = {
     [PAGES.HOME]: HomeIcon,
@@ -30,19 +30,7 @@ export default function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-40 border-b border-white/10 bg-black/50 backdrop-blur-xl">
       <div className="mx-auto max-w-7xl px-4 py-4">
-        <div className="flex items-center justify-between">
-          {/* Title */}
-          <div className="flex-1">
-            <button
-              onClick={() => navigateToPage(PAGES.HOME)}
-              className="group text-left transition-opacity hover:opacity-80"
-            >
-              <h1 className="text-xl font-bold tracking-tight text-white md:text-2xl">
-                Menelek Makonnen
-              </h1>
-            </button>
-          </div>
-
+        <div className="grid grid-cols-3 items-center">
           {/* Navigation Icons */}
           <nav className="flex items-center gap-2 md:gap-4">
             {Object.entries(pageIcons).map(([page, Icon]) => (
@@ -57,8 +45,23 @@ export default function Header() {
             ))}
           </nav>
 
+          {/* Title */}
+          <div className="flex items-center justify-center">
+            <button
+              onClick={() => navigateToPage(PAGES.HOME)}
+              className="group text-center transition-opacity hover:opacity-80"
+            >
+              <h1 className="text-xl font-bold tracking-tight text-white md:text-2xl">
+                Menelek Makonnen
+              </h1>
+            </button>
+          </div>
+
           {/* Premium Brand Icon (animated) */}
-          <PremiumNavIcon />
+          <PremiumNavIcon
+            easterEggActive={easterEggActive}
+            onToggle={() => setEasterEggActive(prev => !prev)}
+          />
         </div>
       </div>
     </header>
@@ -117,20 +120,26 @@ function NavIcon({ page, Icon, isActive, onClick, label }) {
   );
 }
 
-function PremiumNavIcon() {
+function PremiumNavIcon({ easterEggActive, onToggle }) {
   return (
-    <div className="ml-4 hidden md:block">
+    <div className="ml-4 hidden justify-end md:flex">
       <motion.div
-        className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500/30 via-cyan-400/10 to-emerald-400/30 backdrop-blur-sm"
-        animate={{ scale: [1, 1.04, 1] }}
-        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+        onClick={onToggle}
+        className={cn(
+          'group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gradient-to-br from-blue-500/30 via-cyan-400/10 to-emerald-400/30 backdrop-blur-sm transition-colors',
+          easterEggActive ? 'ring-2 ring-cyan-400/50' : ''
+        )}
+        whileHover={{ scale: 1.06 }}
+        whileTap={{ scale: 0.96 }}
+        animate={{ scale: [1, easterEggActive ? 1.07 : 1.03, 1], rotateZ: [0, 6, 0] }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
       >
         <motion.div
           className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-black/40 shadow-inner"
-          animate={{ rotateZ: [-12, 12, -12] }}
-          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+          animate={{ rotateZ: 360 }}
+          transition={{ duration: 16, repeat: Infinity, ease: 'linear' }}
         >
-          <GlobeAltIcon className="h-5 w-5 text-white/70" />
+          <GlobeAltIcon className="h-5 w-5 text-white/70 transition-colors group-hover:text-white" />
         </motion.div>
       </motion.div>
     </div>

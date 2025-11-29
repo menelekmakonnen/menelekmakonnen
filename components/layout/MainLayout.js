@@ -13,7 +13,7 @@ import PowerOffConfirm from '../power/PowerOffConfirm';
 import KeyboardShortcutsHelp from '../overlays/KeyboardShortcutsHelp';
 
 export default function MainLayout({ children }) {
-  const { singleViewItem } = useApp();
+  const { singleViewItem, isShuttingDown, easterEggActive } = useApp();
   const theme = getThemeForTime();
 
   return (
@@ -58,6 +58,32 @@ export default function MainLayout({ children }) {
 
         {/* Keyboard shortcuts help */}
         <KeyboardShortcutsHelp />
+
+        {/* Shutdown overlay */}
+        <AnimatePresence>
+          {isShuttingDown && (
+            <motion.div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center"
+              >
+                <p className="text-lg tracking-[0.3em] text-white/60">POWERING DOWN</p>
+                <div className="mt-4 h-px w-40 bg-white/20" />
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Easter egg glow */}
+        {easterEggActive && (
+          <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.08)_0%,transparent_40%)]" />
+        )}
       </div>
     </>
   );

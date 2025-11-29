@@ -37,6 +37,19 @@ export function AppProvider({ children }) {
   const [showTutorial, setShowTutorial] = useState(false);
   const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
   const [autofocusTrigger, setAutofocusTrigger] = useState(0);
+  const [easterEggActive, setEasterEggActive] = useState(false);
+
+  // Restore power state per day
+  useEffect(() => {
+    const lastPowerOnDate = localStorage.getItem('lastPowerOnDate');
+    const manualPowerOff = localStorage.getItem('manualPowerOff');
+    const today = new Date().toISOString().slice(0, 10);
+
+    if (lastPowerOnDate === today && !manualPowerOff) {
+      setIsPoweredOn(true);
+      setCurrentPage(PAGES.HOME);
+    }
+  }, []);
 
   // Calculate battery level based on time
   useEffect(() => {
@@ -52,6 +65,8 @@ export function AppProvider({ children }) {
       // Auto power-off at 23:59
       if (hours === 23 && minutes === 59 && isPoweredOn) {
         handlePowerOff();
+        localStorage.removeItem('lastPowerOnDate');
+        localStorage.removeItem('manualPowerOff');
       }
     };
 
@@ -68,6 +83,9 @@ export function AppProvider({ children }) {
     setIsPoweredOn(true);
     setIsBooting(false);
     setCurrentPage(PAGES.HOME);
+    setIsShuttingDown(false);
+    localStorage.setItem('lastPowerOnDate', new Date().toISOString().slice(0, 10));
+    localStorage.removeItem('manualPowerOff');
 
     // Check if first visit
     const hasVisited = localStorage.getItem('hasVisited');
@@ -84,6 +102,7 @@ export function AppProvider({ children }) {
     setIsPoweredOn(false);
     setIsShuttingDown(false);
     setShowPowerOffConfirm(false);
+    localStorage.setItem('manualPowerOff', 'true');
 
     // Reset states
     setCurrentPage(PAGES.HOME);
@@ -260,6 +279,8 @@ export function AppProvider({ children }) {
     showShortcutsHelp,
     setShowShortcutsHelp,
     autofocusTrigger,
+    easterEggActive,
+    setEasterEggActive,
 
     // Keyboard
     handleEscapeKey

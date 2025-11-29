@@ -9,9 +9,11 @@ import {
 } from '@heroicons/react/24/outline';
 import { useApp } from '@/contexts/AppContext';
 import { PAGES } from '@/lib/constants/pages';
+import { LENS_MODES } from '@/lib/constants/camera';
 
 export default function HomePage() {
-  const { navigateToPage } = useApp();
+  const { navigateToPage, cameraSettings } = useApp();
+  const lensMode = cameraSettings?.lensMode || LENS_MODES.STANDARD;
 
   const sections = [
     {
@@ -85,7 +87,17 @@ export default function HomePage() {
       </motion.div>
 
       {/* Section Cards */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div
+        className={`grid grid-cols-1 gap-6 ${
+          lensMode === LENS_MODES.WIDE
+            ? 'md:grid-cols-3 lg:grid-cols-4'
+            : lensMode === LENS_MODES.TELEPHOTO
+              ? 'md:grid-cols-2 lg:grid-cols-2'
+              : lensMode === LENS_MODES.MACRO
+                ? 'md:grid-cols-1'
+                : 'md:grid-cols-2 lg:grid-cols-3'
+        }`}
+      >
         {sections.map((section, index) => (
           <SectionCard
             key={section.id}
@@ -145,9 +157,13 @@ function SectionCard({ section, index, onClick }) {
 
       {/* Content */}
       <div className="relative">
-        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-white/10">
-          <Icon className="h-6 w-6 text-white" />
-        </div>
+        <motion.div
+          className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-white/10 transition-transform"
+          whileHover={{ scale: 1.08, rotate: -3 }}
+          whileTap={{ scale: 1.15, rotate: 0 }}
+        >
+          <Icon className="h-6 w-6 text-white drop-shadow" />
+        </motion.div>
 
         <h3 className="mb-2 text-xl font-bold text-white">
           {section.title}

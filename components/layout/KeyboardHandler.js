@@ -65,7 +65,8 @@ export default function KeyboardHandler() {
     navigateToPreviousPage,
     navigateToNextPage,
     handleEscapeKey,
-    setShowShortcutsHelp
+    setShowShortcutsHelp,
+    singleViewItem
   ]);
 
   return null;

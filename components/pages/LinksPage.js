@@ -4,8 +4,22 @@ import {
   GlobeAltIcon
 } from '@heroicons/react/24/outline';
 import { PERSONAL_LINKS, PROFESSIONAL_LINKS, WEBSITES, NOVEL } from '@/lib/data/links';
+import { useApp } from '@/contexts/AppContext';
+import { LENS_MODES } from '@/lib/constants/camera';
 
 export default function LinksPage() {
+  const { cameraSettings } = useApp();
+  const lensMode = cameraSettings?.lensMode || LENS_MODES.STANDARD;
+
+  const gridClass =
+    lensMode === LENS_MODES.WIDE
+      ? 'md:grid-cols-2 lg:grid-cols-3'
+      : lensMode === LENS_MODES.TELEPHOTO
+        ? 'md:grid-cols-1'
+        : lensMode === LENS_MODES.MACRO
+          ? 'grid-cols-1'
+          : 'md:grid-cols-2';
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
       {/* Page header */}
@@ -23,7 +37,7 @@ export default function LinksPage() {
       </motion.div>
 
       {/* Personal Links */}
-      <Section title="Personal" links={PERSONAL_LINKS} />
+      <Section title="Personal" links={PERSONAL_LINKS} gridClass={gridClass} />
 
       {/* Novel */}
       <motion.div
@@ -39,15 +53,15 @@ export default function LinksPage() {
       </motion.div>
 
       {/* Professional Links */}
-      <Section title="Professional & Brand Pages" links={PROFESSIONAL_LINKS} delay={0.3} />
+      <Section title="Professional & Brand Pages" links={PROFESSIONAL_LINKS} delay={0.3} gridClass={gridClass} />
 
       {/* Websites */}
-      <Section title="Websites" links={WEBSITES} delay={0.4} />
+      <Section title="Websites" links={WEBSITES} delay={0.4} gridClass={gridClass} />
     </div>
   );
 }
 
-function Section({ title, links, delay = 0.1 }) {
+function Section({ title, links, delay = 0.1, gridClass }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -58,7 +72,7 @@ function Section({ title, links, delay = 0.1 }) {
       <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white/40">
         {title}
       </h2>
-      <div className="space-y-3">
+      <div className={`grid grid-cols-1 gap-3 ${gridClass}`}>
         {links.map((link, index) => (
           <LinkCard key={link.id} link={link} index={index} />
         ))}
