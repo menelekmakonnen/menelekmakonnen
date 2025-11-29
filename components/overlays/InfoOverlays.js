@@ -37,13 +37,13 @@ export default function InfoOverlays() {
 
   return (
     <>
-      <TopLeftInfo currentPage={currentPage} />
+      <PageBadge currentPage={currentPage} />
       <TopRightInfo />
     </>
   );
 }
 
-function TopLeftInfo({ currentPage }) {
+function PageBadge({ currentPage }) {
   const fileCount = getPageFileCount(currentPage);
   const totalCount = getTotalFileCount();
   const [subtitles, setSubtitles] = useState(INITIAL_TITLES);
@@ -99,11 +99,11 @@ function TopLeftInfo({ currentPage }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      className="fixed top-20 left-4 z-30 space-y-2 font-mono text-xs text-white/80"
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="pointer-events-none fixed left-1/2 top-4 z-30 -translate-x-1/2 space-y-2 text-center font-mono text-xs text-white/80"
     >
-      <div className="rounded border border-emerald-400/30 bg-black/60 px-2 py-1 text-emerald-200 backdrop-blur-sm">
+      <div className="inline-flex rounded border border-emerald-400/30 bg-black/60 px-3 py-1 text-emerald-200 backdrop-blur-sm">
         {PAGE_DISPLAY_NAMES[currentPage] || 'UNKNOWN'}
       </div>
       {fileCount !== 0 && (
@@ -111,12 +111,10 @@ function TopLeftInfo({ currentPage }) {
           Files here: {fileCount}
         </div>
       )}
-      <div className="text-[10px] text-white/50">
-        Library ready: {totalCount}
-      </div>
+      <div className="text-[10px] text-white/50">Library ready: {totalCount}</div>
 
       {/* Rotating subtitles - relocated here */}
-      <div className="flex flex-col gap-1 mt-2">
+      <div className="pointer-events-auto mt-2 flex flex-col gap-1">
         {subtitles.map((title, index) => (
           <button
             key={`slot-${index}`}
@@ -149,7 +147,7 @@ function TopRightInfo() {
     <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
-      className="fixed top-20 right-4 z-30 space-y-2 text-right font-mono text-xs"
+      className="pointer-events-none fixed top-6 right-4 z-30 space-y-2 text-right font-mono text-xs"
     >
       {/* Greeting */}
       <div className="text-white/60">

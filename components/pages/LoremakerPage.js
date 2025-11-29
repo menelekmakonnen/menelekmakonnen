@@ -16,13 +16,26 @@ export default function LoremakerPage() {
       const allCharacters = await fetchLoremakerCharacters();
       const charactersWithImages = filterCharactersWithImages(allCharacters);
       const randomCharacters = getRandomCharacters(charactersWithImages, 20);
-      setCharacters(randomCharacters);
+      const blurredCta = {
+        id: 'loremaker-cta',
+        character: 'Enter the Universe',
+        alias: 'Loremaker',
+        shortDescription: 'See every character and arc on loremaker.cloud',
+        coverImage: '',
+        galleryImages: [],
+        cta: true
+      };
+      setCharacters([...randomCharacters, blurredCta]);
     };
 
     loadCharacters();
   }, []);
 
   const handleItemClick = (item) => {
+    if (item.cta) {
+      window.open('https://loremaker.cloud', '_blank');
+      return;
+    }
     setSingleViewItem(item);
   };
 
@@ -86,7 +99,9 @@ export default function LoremakerPage() {
             ...char,
             id: char.character,
             name: char.character,
-            thumbnail: getDriveImageUrl(char.coverImage) || getDriveImageUrl(char.galleryImages[0]) || char.coverImage || char.galleryImages[0],
+            thumbnail: char.cta
+              ? '/images/loremaker-blur.svg'
+              : getDriveImageUrl(char.coverImage) || getDriveImageUrl(char.galleryImages[0]) || char.coverImage || char.galleryImages[0],
             description: char.shortDescription
           }))}
           onItemClick={handleItemClick}
@@ -126,6 +141,8 @@ export default function LoremakerPage() {
 }
 
 function CharacterSingleView({ character, characters, onClose }) {
+  const suggested = characters.filter(c => c.id !== character.id && !c.cta).sort(() => 0.5 - Math.random()).slice(0, 4);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -145,10 +162,10 @@ function CharacterSingleView({ character, characters, onClose }) {
             </svg>
           </button>
 
-          {/* Character content */}
-          <div className="grid gap-8 md:grid-cols-2">
-            {/* Image */}
-            <div className="relative aspect-square overflow-hidden rounded-lg">
+      {/* Character content */}
+      <div className="grid gap-8 md:grid-cols-2">
+        {/* Image */}
+        <div className="relative aspect-square overflow-hidden rounded-lg">
               <img
                 src={getDriveImageUrl(character.coverImage) || getDriveImageUrl(character.galleryImages?.[0]) || character.coverImage || character.galleryImages?.[0]}
                 alt={character.character}
@@ -226,15 +243,38 @@ function CharacterSingleView({ character, characters, onClose }) {
                 href="https://loremaker.cloud"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 px-6 py-3 text-purple-400 transition-all hover:bg-purple-500/20"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span>Read More on Loremaker</span>
-                <ArrowTopRightOnSquareIcon className="h-5 w-5" />
-              </motion.a>
+            className="inline-flex items-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 px-6 py-3 text-purple-400 transition-all hover:bg-purple-500/20"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <span>Read More on Loremaker</span>
+            <ArrowTopRightOnSquareIcon className="h-5 w-5" />
+          </motion.a>
+
+          {suggested.length > 0 && (
+            <div className="mt-6">
+              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-white/50">Other characters</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {suggested.map(other => (
+                  <div key={other.id} className="rounded-lg border border-white/10 bg-white/5 p-2 text-white/80">
+                    <div className="aspect-video overflow-hidden rounded-md">
+                      <img
+                        src={getDriveImageUrl(other.coverImage) || getDriveImageUrl(other.galleryImages?.[0]) || other.coverImage || other.galleryImages?.[0]}
+                        alt={other.character}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <p className="mt-2 text-sm font-semibold">{other.character}</p>
+                    {other.shortDescription && (
+                      <p className="text-xs text-white/60">{other.shortDescription}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+        </div>
+      </div>
         </div>
       </div>
     </motion.div>
