@@ -52,12 +52,34 @@ export default function FilmsPage() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <h1 className="text-4xl font-bold text-white">
-              Films & Music Videos
-            </h1>
-            <p className="mt-2 text-white/60">
-              Cinematic storytelling and visual narratives
-            </p>
+            <div className="flex items-end justify-between">
+              <div>
+                <h1 className="text-4xl font-bold text-white">
+                  Films & Music Videos
+                </h1>
+                <p className="mt-2 text-white/60">
+                  Cinematic storytelling and visual narratives
+                </p>
+              </div>
+
+              {/* View All button */}
+              <motion.button
+                onClick={() => handleAlbumClick({
+                  id: 'all',
+                  title: 'All Films & Music Videos',
+                  description: 'Complete collection',
+                  items: [...FILMS, ...MUSIC_VIDEOS]
+                })}
+                className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm text-white transition-all hover:bg-white/10"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                View All
+              </motion.button>
+            </div>
           </motion.div>
 
           {/* Album grid */}

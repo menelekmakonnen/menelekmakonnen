@@ -37,12 +37,39 @@ export default function VideoEditsPage() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <h1 className="text-4xl font-bold text-white">
-              Video Edits
-            </h1>
-            <p className="mt-2 text-white/60">
-              Epic edits, beauty, behind the scenes, and AI & learning content
-            </p>
+            <div className="flex items-end justify-between">
+              <div>
+                <h1 className="text-4xl font-bold text-white">
+                  Video Edits
+                </h1>
+                <p className="mt-2 text-white/60">
+                  Epic edits, beauty, behind the scenes, and AI & learning content
+                </p>
+              </div>
+
+              {/* View All button */}
+              <motion.button
+                onClick={() => handleAlbumClick({
+                  id: 'all',
+                  title: 'All Video Edits',
+                  description: 'Complete collection of Instagram reels',
+                  items: [
+                    ...VIDEO_EDIT_ALBUMS['epic-edits'].items,
+                    ...VIDEO_EDIT_ALBUMS['beauty-and-travel'].items,
+                    ...VIDEO_EDIT_ALBUMS['behind-the-scenes'].items,
+                    ...VIDEO_EDIT_ALBUMS['ai-and-learning'].items
+                  ]
+                })}
+                className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm text-white transition-all hover:bg-white/10"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                View All
+              </motion.button>
+            </div>
           </motion.div>
 
           {/* Album grid */}
