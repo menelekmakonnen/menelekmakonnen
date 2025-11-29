@@ -6,7 +6,7 @@ import { getGreeting } from '@/lib/constants/greetings';
 import { formatStorage } from '@/lib/utils/helpers';
 import { FILMS, MUSIC_VIDEOS } from '@/lib/data/films';
 import { VIDEO_EDIT_ALBUMS } from '@/lib/data/videoEdits';
-import { LINKS } from '@/lib/data/links';
+import { ALL_LINKS } from '@/lib/data/links';
 
 // Calculate total file count based on current page
 function getFileCount(currentPage) {
@@ -16,7 +16,7 @@ function getFileCount(currentPage) {
     case PAGES.VIDEO_EDITS:
       return Object.values(VIDEO_EDIT_ALBUMS).reduce((total, album) => total + album.items.length, 0);
     case PAGES.LINKS:
-      return LINKS.length;
+      return ALL_LINKS.length;
     case PAGES.LOREMAKER:
       // Loremaker loads dynamically, so we show a placeholder
       return '~200+';
