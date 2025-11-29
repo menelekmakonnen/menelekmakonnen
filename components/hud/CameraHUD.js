@@ -16,7 +16,8 @@ import {
   AdjustmentsVerticalIcon,
   CursorArrowRaysIcon,
   VariableIcon,
-  MagnifyingGlassCircleIcon
+  MagnifyingGlassCircleIcon,
+  HomeIcon
 } from '@heroicons/react/24/outline';
 import { useApp } from '@/contexts/AppContext';
 import {
@@ -29,6 +30,7 @@ import {
   CURSOR_MODES,
   LENS_MODES
 } from '@/lib/constants/camera';
+import { PAGES } from '@/lib/constants/pages';
 import { cn } from '@/lib/utils/helpers';
 import BatteryIndicator from './BatteryIndicator';
 
@@ -51,7 +53,8 @@ export default function CameraHUD() {
     showFocusPeaking,
     setShowFocusPeaking,
     showZebra,
-    setShowZebra
+    setShowZebra,
+    navigateToPage
   } = useApp();
 
   const [openPanel, setOpenPanel] = useState(null); // 'iso', 'aperture', 'shutter', 'wb', or null
@@ -291,6 +294,13 @@ export default function CameraHUD() {
 
               {/* Right Side - System */}
               <div className="flex items-center gap-2">
+                {/* Home */}
+                <HUDButton
+                  onClick={() => navigateToPage(PAGES.HOME)}
+                  icon={HomeIcon}
+                  label="Home"
+                />
+
                 {/* Reset */}
                 <AnimatePresence>
                   {cameraHistory.length > 0 && (

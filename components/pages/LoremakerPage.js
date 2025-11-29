@@ -155,6 +155,7 @@ export default function LoremakerPage() {
           items={characters}
           onItemClick={handleItemClick}
           type="vertical"
+          descriptionOnHover
         />
       ) : (
         <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/60">

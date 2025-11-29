@@ -16,7 +16,7 @@ const SORT_OPTIONS = {
   ZA: 'z-a'
 };
 
-export default function ItemGrid({ items, onItemClick, type = 'vertical' }) {
+export default function ItemGrid({ items, onItemClick, type = 'vertical', descriptionOnHover = false }) {
   const { cameraSettings } = useApp();
   const [sortMode, setSortMode] = useState(SORT_OPTIONS.RANDOM);
   const [sortedItems, setSortedItems] = useState(items);
@@ -119,6 +119,7 @@ export default function ItemGrid({ items, onItemClick, type = 'vertical' }) {
             item={item}
             index={index}
             type={type}
+            descriptionOnHover={descriptionOnHover}
             onClick={() => onItemClick(item, index)}
           />
         ))}
@@ -146,7 +147,7 @@ function SortButton({ icon: Icon, label, active, onClick }) {
   );
 }
 
-function ItemCard({ item, index, type, onClick }) {
+function ItemCard({ item, index, type, onClick, descriptionOnHover }) {
   // Determine aspect ratio based on content type
   const aspectRatio =
     type === 'horizontal' ? 'aspect-video' :   // 16:9 for films/YouTube
@@ -219,7 +220,12 @@ function ItemCard({ item, index, type, onClick }) {
               {item.title || item.name || item.character}
             </p>
             {item.description && (
-              <p className="mt-1 text-left text-xs text-white/70 transition-opacity duration-300 group-hover:opacity-100 opacity-60">
+              <p
+                className={cn(
+                  'mt-1 text-left text-xs text-white/70 transition-opacity duration-300',
+                  descriptionOnHover ? 'opacity-0 group-hover:opacity-100' : 'opacity-60 group-hover:opacity-100'
+                )}
+              >
                 {item.description}
               </p>
             )}

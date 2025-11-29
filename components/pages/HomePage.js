@@ -81,24 +81,6 @@ export default function HomePage() {
         <p className="mx-auto max-w-3xl text-lg text-white/70">
           I build universes, shoot films inside them, then use AI to bend the tools to my will.
         </p>
-
-        <div className="mx-auto mt-6 max-w-4xl space-y-4 text-base text-white/70">
-          <p>
-            I grew up in Ghana reading Spirou et Fantasio, Tintin and a stack of worn-out Disney comics from the 80s and 90s.
-            By thirteen I was deep in The Wizard in the Woods, The Worst Witch and Harry Potter and the Philosopher’s Stone.
-            By fifteen I’d graduated to Justice League, The Batman (2004) and Static Shock. Those worlds raised my imagination.
-            Now I’m building their peer.
-          </p>
-          <p>
-            I’m a Ghanaian filmmaker, creative director and universe-builder working between London and Accra. I don’t make “the African version of” anything.
-            I build original fantasy, superhero and supernatural worlds that can sit on the same shelf as Tolkien, GRRM, the MCU and DC Animation – not under them.
-          </p>
-          <p>
-            On this site you’ll find three pillars of what I do: LORE – the living, expanding universe behind my stories. FILM & VIDEO – short films, music videos and cinematic reels.
-            AI & VISUALS – photography, AI-generated concept art and edits that look like they escaped from a storyboard.
-            If you’re a studio, brand or human with taste and a bit of courage, this is your invitation. Come explore. Get obsessed. Then call me when you’re ready to build something bigger than you are.
-          </p>
-        </div>
       </motion.div>
 
       {/* Section Cards */}
@@ -135,11 +117,19 @@ export default function HomePage() {
         </h2>
         <div className="space-y-3 text-white/70">
           <p>
-            Menelek Makonnen is not just a creative—he's a visionary renegade, crafting worlds vivid enough to lose yourself in, yet grounded enough to find yourself anew.
-            With roots deep in early fascinations from Tintin’s daring exploits and Spirou’s whimsical adventures, Menelek evolved into a master storyteller blending the intricate plotting of Game of Thrones with the thrilling heroics of the MCU’s golden years.
+            I grew up in Ghana reading Spirou et Fantasio, Tintin and a stack of worn-out Disney comics from the 80s and 90s. By thirteen I was deep in The Wizard in the Woods, The Worst Witch and Harry Potter and the Philosopher’s Stone. By fifteen I’d graduated to Justice League, The Batman (2004) and Static Shock. Those worlds raised my imagination. Now I’m building their peer.
           </p>
           <p>
-            Here, reality dances seductively with fantasy, urging you to take a step closer. Dare to explore. Dare to collaborate. Dare to create something unforgettable.
+            I’m a Ghanaian filmmaker, creative director and universe-builder working between London and Accra. I don’t make “the African version of” anything. I build original fantasy, superhero and supernatural worlds that can sit on the same shelf as Tolkien, GRRM, the MCU and DC Animation – not under them.
+          </p>
+          <p>
+            On this site you’ll find three pillars of what I do: LORE – the living, expanding universe behind my stories. FILM & VIDEO – short films, music videos and cinematic reels. AI & VISUALS – photography, AI-generated concept art and edits that look like they escaped from a storyboard.
+          </p>
+          <p>
+            Menelek Makonnen is not just a creative—he's a visionary renegade, crafting worlds vivid enough to lose yourself in, yet grounded enough to find yourself anew. With roots deep in early fascinations from Tintin’s daring exploits and Spirou’s whimsical adventures, Menelek evolved into a master storyteller blending the intricate plotting of Game of Thrones with the thrilling heroics of the MCU’s golden years.
+          </p>
+          <p>
+            Here, reality dances seductively with fantasy, urging you to take a step closer. Dare to explore. Dare to collaborate. Dare to create something unforgettable. If you’re a studio, brand or human with taste and a bit of courage, this is your invitation. Come explore. Get obsessed. Then call me when you’re ready to build something bigger than you are.
           </p>
         </div>
       </motion.div>
