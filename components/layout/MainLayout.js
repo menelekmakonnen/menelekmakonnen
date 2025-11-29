@@ -8,6 +8,7 @@ import InfoOverlays from '../overlays/InfoOverlays';
 import CameraCursor from '../cursor/CameraCursor';
 import KeyboardHandler from './KeyboardHandler';
 import PowerOffConfirm from '../power/PowerOffConfirm';
+import KeyboardShortcutsHelp from '../overlays/KeyboardShortcutsHelp';
 
 export default function MainLayout({ children }) {
   const { singleViewItem } = useApp();
@@ -46,6 +47,9 @@ export default function MainLayout({ children }) {
 
         {/* Power off confirmation */}
         <PowerOffConfirm />
+
+        {/* Keyboard shortcuts help */}
+        <KeyboardShortcutsHelp />
       </div>
     </>
   );
