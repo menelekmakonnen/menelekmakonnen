@@ -195,6 +195,8 @@ function CharacterSingleView({ character, characters, onClose, onSelectCharacter
   const suggested = characters.filter(c => c.id !== character.id && !c.cta).sort(() => 0.5 - Math.random()).slice(0, 4);
   const galleryImages = [character.coverImage, ...(character.galleryImages || [])].filter(Boolean);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const viewableCharacters = characters.filter(c => !c.cta);
+  const currentCharacterIndex = viewableCharacters.findIndex(c => c.id === character.id);
 
   useEffect(() => {
     setActiveImageIndex(0);
@@ -208,7 +210,36 @@ function CharacterSingleView({ character, characters, onClose, onSelectCharacter
       className="fixed inset-0 z-50 overflow-y-auto bg-black/95 backdrop-blur-md"
     >
       <div className="min-h-screen p-8">
-        <div className="mx-auto max-w-5xl">
+        <div className="relative mx-auto max-w-5xl">
+          {viewableCharacters.length > 1 && (
+            <>
+              <button
+                onClick={() => {
+                  const prevIndex = currentCharacterIndex > 0 ? currentCharacterIndex - 1 : viewableCharacters.length - 1;
+                  onSelectCharacter(viewableCharacters[prevIndex]);
+                }}
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-8 md:-translate-x-14 flex items-center gap-2 rounded-full border border-white/20 bg-black/60 px-3 py-2 text-white transition-all hover:border-white/50 hover:bg-white/10"
+                aria-label="Previous character"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+
+              <button
+                onClick={() => {
+                  const nextIndex = currentCharacterIndex < viewableCharacters.length - 1 ? currentCharacterIndex + 1 : 0;
+                  onSelectCharacter(viewableCharacters[nextIndex]);
+                }}
+                className="absolute right-0 top-1/2 translate-x-8 md:translate-x-14 -translate-y-1/2 flex items-center gap-2 rounded-full border border-white/20 bg-black/60 px-3 py-2 text-white transition-all hover:border-white/50 hover:bg-white/10"
+                aria-label="Next character"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </>
+          )}
           {/* Close button */}
           <button
             onClick={onClose}
@@ -227,6 +258,8 @@ function CharacterSingleView({ character, characters, onClose, onSelectCharacter
                 src={getDriveImageUrl(galleryImages[activeImageIndex]) || galleryImages[activeImageIndex]}
                 alt={character.character}
                 className="h-full w-full object-cover"
+                loading="lazy"
+                decoding="async"
               />
 
               {galleryImages.length > 1 && (
@@ -358,6 +391,8 @@ function CharacterSingleView({ character, characters, onClose, onSelectCharacter
                         src={getDriveImageUrl(other.coverImage) || getDriveImageUrl(other.galleryImages?.[0]) || other.coverImage || other.galleryImages?.[0]}
                         alt={other.character}
                         className="h-full w-full object-cover"
+                        loading="lazy"
+                        decoding="async"
                       />
                     </div>
                     <p className="mt-2 text-sm font-semibold">{other.character}</p>

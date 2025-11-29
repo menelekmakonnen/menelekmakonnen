@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useApp } from '@/contexts/AppContext';
 import { cn, shuffle } from '@/lib/utils/helpers';
@@ -85,6 +85,12 @@ export default function ItemGrid({ items, onItemClick, type = 'vertical', descri
     setSortMode(mode);
     setSortedItems(sorted);
   };
+
+  // Keep sorted items in sync when the source list changes
+  useEffect(() => {
+    setSortedItems(shuffle(items));
+    setSortMode(SORT_OPTIONS.RANDOM);
+  }, [items]);
 
   return (
     <div>
@@ -197,6 +203,7 @@ function ItemCard({ item, index, type, onClick, descriptionOnHover }) {
             alt={item.title || item.name || item.character}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
             loading="lazy"
+            decoding="async"
           />
           {/* Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />

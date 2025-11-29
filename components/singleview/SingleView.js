@@ -268,6 +268,7 @@ function YouTubeEmbed({ url, expanded }) {
         className="h-full w-full"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
+        loading="lazy"
       />
     </div>
   );
@@ -286,6 +287,7 @@ function InstagramEmbed({ url, embedCode, expanded }) {
         scrolling="no"
         allowTransparency="true"
         allow="encrypted-media"
+        loading="lazy"
       />
     </div>
   );
@@ -320,6 +322,8 @@ function ImageDisplay({ src, alt, expanded, lensMode }) {
           'object-contain transition-transform duration-200',
           expanded ? 'h-full w-full' : 'w-full rounded-lg'
         )}
+        loading="lazy"
+        decoding="async"
         style={{
           maxHeight: expanded ? 'none' : '70vh',
           transform: expanded ? `scale(${zoom})` : 'none'
@@ -393,6 +397,8 @@ function SidebarItem({ item, isActive, onClick }) {
             src={getThumbnail()}
             alt={item.title || item.name || item.character}
             className="h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
           />
         )}
       </div>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FolderIcon } from '@heroicons/react/24/outline';
-import { MOCK_PHOTOGRAPHY_ALBUMS } from '@/lib/data/googleDrive';
+import { PHOTOGRAPHY_ALBUMS } from '@/lib/data/googleDrive';
 import AlbumGrid from '../album/AlbumGrid';
 import ItemGrid from '../album/ItemGrid';
 import SingleView from '../singleview/SingleView';
@@ -11,7 +11,7 @@ export default function PhotographyPage() {
   const [selectedAlbum, setSelectedAlbum] = useState(null);
   const [singleViewItem, setSingleViewItem] = useState(null);
 
-  const albums = MOCK_PHOTOGRAPHY_ALBUMS;
+  const albums = PHOTOGRAPHY_ALBUMS;
   const categories = Array.from(
     new Map(
       albums.map(album => [

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SparklesIcon } from '@heroicons/react/24/outline';
-import { MOCK_AI_ALBUMS } from '@/lib/data/googleDrive';
+import { AI_ALBUMS } from '@/lib/data/googleDrive';
 import AlbumGrid from '../album/AlbumGrid';
 import ItemGrid from '../album/ItemGrid';
 import SingleView from '../singleview/SingleView';
@@ -11,7 +10,7 @@ export default function AIAlbumsPage() {
   const [singleViewItem, setSingleViewItem] = useState(null);
 
   // In production, fetch from Google Drive
-  const albums = MOCK_AI_ALBUMS;
+  const albums = AI_ALBUMS;
 
   const handleAlbumClick = (album) => {
     setSelectedAlbum(album);
@@ -52,19 +51,6 @@ export default function AIAlbumsPage() {
                 If your company is still arguing about whether AI is “allowed,” you’re already behind. I’m more interested in what we can build with it.
               </p>
             </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mb-8 rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-left text-sm text-white/70"
-          >
-            <p className="flex items-center gap-2 font-semibold text-green-200">
-              <SparklesIcon className="h-5 w-5" />
-              Drive-ready placeholders
-            </p>
-            <p className="mt-2">Replace the URLs in <code>lib/data/googleDrive.js</code> with your Drive thumbnails to wire up the live feed.</p>
           </motion.div>
 
           {/* Album grid */}
