@@ -1,13 +1,7 @@
-import { AnimatePresence } from 'framer-motion';
-import { AppProvider } from '@/contexts/AppContext';
-import '@/styles/globals.css';
+import '../styles/globals.css'
 
-export default function MyApp({ Component, pageProps }) {
-  return (
-    <AppProvider>
-      <AnimatePresence mode="wait">
-        <Component {...pageProps} />
-      </AnimatePresence>
-    </AppProvider>
-  );
+function MyApp({ Component, pageProps }) {
+  return <Component {...pageProps} />
 }
+
+export default MyApp
