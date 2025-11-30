@@ -1,11 +1,11 @@
 import Link from 'next/link';
 
-import Link from 'next/link';
+
 
 const albums = [
   { id: '1q7CcuPAmo0woea1YGazreweS5fk8tiy', name: 'Beauty' },
   { id: '1BjHTapDOAvfdhyuGmN3Q_skSY4QhNX-W', name: 'Professional' },
-];
+]
 
 export default function Photography() {
   return (
