@@ -11,9 +11,10 @@ import CameraCursor from '../cursor/CameraCursor';
 import KeyboardHandler from './KeyboardHandler';
 import PowerOffConfirm from '../power/PowerOffConfirm';
 import KeyboardShortcutsHelp from '../overlays/KeyboardShortcutsHelp';
+import CachePermissionPopup from '../common/CachePermissionPopup';
 
 export default function MainLayout({ children }) {
-  const { singleViewItem } = useApp();
+  const { singleViewItem, visualState } = useApp();
   const theme = getThemeForTime();
 
   return (
@@ -43,9 +44,11 @@ export default function MainLayout({ children }) {
 
         {/* Main content area */}
         <main
-          className={`relative min-h-screen pt-20 pb-24 transition-all duration-500 ${
-            singleViewItem ? 'blur-sm' : ''
-          }`}
+          className={`relative min-h-screen pt-20 pb-24 transition-all duration-500`}
+          style={{
+            filter: visualState.filter + (singleViewItem ? ' blur(4px)' : ''),
+            backdropFilter: `blur(${visualState.blurAmount})`
+          }}
         >
           {children}
         </main>
@@ -55,6 +58,9 @@ export default function MainLayout({ children }) {
 
         {/* Power off confirmation */}
         <PowerOffConfirm />
+
+        {/* Permission Popup */}
+        <CachePermissionPopup />
 
         {/* Keyboard shortcuts help */}
         <KeyboardShortcutsHelp />

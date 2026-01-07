@@ -96,14 +96,15 @@ export default function VideoEditsPage() {
             <p className="mt-2 text-white/60">
               {selectedAlbum.description}
             </p>
-            <p className="mt-1 text-sm text-white/40">
-              {selectedAlbum.items.length} {selectedAlbum.items.length === 1 ? 'reel' : 'reels'}
-            </p>
           </motion.div>
 
           {/* Item grid (vertical for Instagram) */}
           <ItemGrid
-            items={selectedAlbum.items}
+            items={selectedAlbum.items.map(item => ({
+              ...item,
+              // Ensure video thumbnail is resolved (High quality)
+              thumbnail: item.thumbnail || (item.youtubeUrl ? `https://img.youtube.com/vi/${item.youtubeUrl.split('v=')[1]}/maxresdefault.jpg` : null)
+            }))}
             onItemClick={handleItemClick}
             type="vertical"
           />

@@ -2,20 +2,10 @@ import { useApp } from '@/contexts/AppContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function CameraVisualEffects() {
-  const { cameraSettings } = useApp();
-
-  // Calculate effect intensity based on camera settings
-  const getGrainIntensity = () => {
-    // Higher ISO = more grain
-    const iso = cameraSettings.iso;
-    if (iso >= 6400) return 0.15;
-    if (iso >= 3200) return 0.10;
-    if (iso >= 1600) return 0.06;
-    if (iso >= 800) return 0.03;
-    return 0;
-  };
+  const { cameraSettings, visualState, isEcoMode } = useApp();
 
   const getBlurIntensity = () => {
+    if (isEcoMode) return '0px';
     // Lower aperture (wider opening) = more blur
     const aperture = cameraSettings.aperture;
     if (aperture <= 1.8) return '4px';
@@ -25,6 +15,7 @@ export default function CameraVisualEffects() {
   };
 
   const getMotionBlur = () => {
+    if (isEcoMode) return false;
     // Slower shutter = more motion blur potential
     const shutter = cameraSettings.shutter;
     if (shutter.includes('1"') || shutter.includes('2"')) return true;
@@ -32,7 +23,7 @@ export default function CameraVisualEffects() {
     return false;
   };
 
-  const grainOpacity = getGrainIntensity();
+  const grainOpacity = visualState.grainOpacity;
   const blurAmount = getBlurIntensity();
   const hasMotionBlur = getMotionBlur();
 

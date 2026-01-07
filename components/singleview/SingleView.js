@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   XMarkIcon,
@@ -11,22 +12,36 @@ import {
 } from '@heroicons/react/24/outline';
 import { useApp } from '@/contexts/AppContext';
 import { cn } from '@/lib/utils/helpers';
+import { getDriveImageUrl } from '@/lib/data/googleDrive';
+import SlideshowView from './SlideshowView';
 
 export default function SingleView({ item, items, albums = [], currentAlbumId, onClose }) {
   const {
+    updateCameraSetting,
+    hudMode,
+    setHudMode,
     isSingleViewExpanded,
     setIsSingleViewExpanded,
     isSlideshowActive,
     setIsSlideshowActive
   } = useApp();
 
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
   const [currentIndex, setCurrentIndex] = useState(
     items.findIndex(i => i.id === item.id)
   );
+  const [currentItems, setCurrentItems] = useState(items);
   const [selectedAlbumId, setSelectedAlbumId] = useState(currentAlbumId);
   const [slideshowInterval, setSlideshowInterval] = useState(3000);
+  const [isSwitchingAlbum, setIsSwitchingAlbum] = useState(false);
 
-  const currentItem = items[currentIndex];
+  const currentItem = currentItems[currentIndex] || item;
 
   // Slideshow timer
   useEffect(() => {
@@ -80,20 +95,44 @@ export default function SingleView({ item, items, albums = [], currentAlbumId, o
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentIndex, selectedAlbumId, albums]);
 
+  // Handle Album Change
+  useEffect(() => {
+    if (selectedAlbumId === currentAlbumId) {
+      setCurrentItems(items);
+      return;
+    }
+
+    async function loadNewAlbum() {
+      setIsSwitchingAlbum(true);
+      try {
+        const res = await fetch(`/api/album/${selectedAlbumId}`);
+        if (!res.ok) throw new Error('Failed to fetch album');
+        const data = await res.json();
+        setCurrentItems(data.images);
+        setCurrentIndex(0);
+      } catch (err) {
+        console.error('Error switching album:', err);
+      } finally {
+        setIsSwitchingAlbum(false);
+      }
+    }
+
+    loadNewAlbum();
+  }, [selectedAlbumId, currentAlbumId, items]);
+
   const handlePrevious = useCallback(() => {
-    setCurrentIndex(prev => (prev > 0 ? prev - 1 : items.length - 1));
-  }, [items.length]);
+    setCurrentIndex(prev => (prev > 0 ? prev - 1 : currentItems.length - 1));
+  }, [currentItems.length]);
 
   const handleNext = useCallback(() => {
-    setCurrentIndex(prev => (prev < items.length - 1 ? prev + 1 : 0));
-  }, [items.length]);
+    setCurrentIndex(prev => (prev < currentItems.length - 1 ? prev + 1 : 0));
+  }, [currentItems.length]);
 
   const handlePreviousAlbum = useCallback(() => {
     if (albums.length === 0) return;
     const currentAlbumIndex = albums.findIndex(a => a.id === selectedAlbumId);
     const prevIndex = currentAlbumIndex > 0 ? currentAlbumIndex - 1 : albums.length - 1;
     setSelectedAlbumId(albums[prevIndex].id);
-    setCurrentIndex(0); // Go to first item of new album
   }, [albums, selectedAlbumId]);
 
   const handleNextAlbum = useCallback(() => {
@@ -101,10 +140,11 @@ export default function SingleView({ item, items, albums = [], currentAlbumId, o
     const currentAlbumIndex = albums.findIndex(a => a.id === selectedAlbumId);
     const nextIndex = currentAlbumIndex < albums.length - 1 ? currentAlbumIndex + 1 : 0;
     setSelectedAlbumId(albums[nextIndex].id);
-    setCurrentIndex(0);
   }, [albums, selectedAlbumId]);
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -170,9 +210,10 @@ export default function SingleView({ item, items, albums = [], currentAlbumId, o
         {/* Right sidebar (thumbnails) */}
         {!isSingleViewExpanded && (
           <Sidebar
-            items={items}
+            items={currentItems}
             currentIndex={currentIndex}
             onItemClick={setCurrentIndex}
+            isLoading={isSwitchingAlbum}
           />
         )}
       </div>
@@ -185,7 +226,20 @@ export default function SingleView({ item, items, albums = [], currentAlbumId, o
           onAlbumClick={setSelectedAlbumId}
         />
       )}
-    </motion.div>
+      {/* Slideshow Mode Overlay */}
+      <AnimatePresence>
+        {isSlideshowActive && (
+          <SlideshowView
+            item={currentItem}
+            items={currentItems}
+            currentIndex={currentIndex}
+            onIndexChange={setCurrentIndex}
+            onClose={() => setIsSlideshowActive(false)}
+          />
+        )}
+      </AnimatePresence>
+    </motion.div>,
+    document.body
   );
 }
 
@@ -199,8 +253,10 @@ function MainDisplay({ item, expanded }) {
     return <InstagramEmbed url={item.instagramUrl} embedCode={item.embedCode} expanded={expanded} />;
   }
 
-  if (item.coverImage || item.thumbnail) {
-    return <ImageDisplay src={item.coverImage || item.thumbnail} alt={item.title || item.name || item.character} expanded={expanded} />;
+  const imageUrl = item.coverImage || item.thumbnail || item.url || (item.id && !item.id.includes('-') && getDriveImageUrl(item.id));
+
+  if (imageUrl) {
+    return <ImageDisplay src={getImageUrl(imageUrl)} alt={item.title || item.name || item.character} expanded={expanded} />;
   }
 
   return (
@@ -267,8 +323,8 @@ function ImageDisplay({ src, alt, expanded }) {
   return (
     <div
       className={cn(
-        'relative flex items-center justify-center overflow-auto',
-        expanded ? 'h-full w-full' : 'w-full'
+        'relative flex h-full w-full items-center justify-center overflow-hidden',
+        expanded ? 'p-0' : 'p-4'
       )}
       onWheel={handleWheel}
     >
@@ -276,11 +332,10 @@ function ImageDisplay({ src, alt, expanded }) {
         src={src}
         alt={alt}
         className={cn(
-          'object-contain transition-transform duration-200',
-          expanded ? 'h-full w-full' : 'w-full rounded-lg'
+          'max-h-full max-w-full object-contain transition-transform duration-200',
+          expanded ? '' : 'rounded-lg shadow-2xl'
         )}
         style={{
-          maxHeight: expanded ? 'none' : '70vh',
           transform: expanded ? `scale(${zoom})` : 'none'
         }}
       />
@@ -298,18 +353,92 @@ function ImageDisplay({ src, alt, expanded }) {
   );
 }
 
-function Sidebar({ items, currentIndex, onItemClick }) {
+
+function Sidebar({ items, currentIndex, onItemClick, isLoading }) {
+  const scrollRef = useRef(null);
+  const [sortMode, setSortMode] = useState('original');
+  const [sortedItems, setSortedItems] = useState(items);
+
+  // Update sorted items when items or sort mode changes
+  useEffect(() => {
+    let newItems = [...items];
+    switch (sortMode) {
+      case 'az':
+        newItems.sort((a, b) => (a.title || a.name || '').localeCompare(b.title || b.name || ''));
+        break;
+      case 'za':
+        newItems.sort((a, b) => (b.title || b.name || '').localeCompare(a.title || a.name || ''));
+        break;
+      case 'random':
+        newItems = [...items].sort(() => Math.random() - 0.5);
+        break;
+      default:
+        newItems = items;
+    }
+    setSortedItems(newItems);
+  }, [items, sortMode]);
+
+  // Find the index of the current item in the SORTED list to highlight correctly
+  const currentItem = items[currentIndex];
+  // Calculate sorted index for highlighting
+  const sortedCurrentIndex = currentItem ? sortedItems.findIndex(i => i.id === currentItem.id) : -1;
+
+  // Auto-center current item
+  useEffect(() => {
+    if (!scrollRef.current) return;
+    const activeItem = scrollRef.current.children[sortedCurrentIndex];
+    if (activeItem) {
+      activeItem.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest'
+      });
+    }
+  }, [sortedCurrentIndex]);
+
   return (
-    <div className="flex-1 overflow-y-auto border-l border-white/10 bg-black/30 p-4 custom-scrollbar">
-      <div className="space-y-2">
-        {items.map((item, index) => (
-          <SidebarItem
-            key={item.id}
-            item={item}
-            isActive={index === currentIndex}
-            onClick={() => onItemClick(index)}
-          />
-        ))}
+    <div className="flex-1 max-w-[300px] overflow-hidden border-l border-white/10 bg-black/30 backdrop-blur-md flex flex-col">
+      {/* Sidebar Header with Sort */}
+      <div className="p-4 border-b border-white/10 bg-white/5 flex items-center justify-between">
+        <h3 className="text-xs uppercase tracking-[0.2em] text-white/40 font-bold">Roster</h3>
+
+        {/* Sort Dropdown (Simple) */}
+        <select
+          value={sortMode}
+          onChange={(e) => setSortMode(e.target.value)}
+          className="bg-black/20 border border-white/10 text-white/60 text-[10px] uppercase rounded px-2 py-1 outline-none hover:border-white/30"
+        >
+          <option value="original">Default</option>
+          <option value="az">A-Z</option>
+          <option value="za">Z-A</option>
+          <option value="random">Random</option>
+        </select>
+      </div>
+
+      <div
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-3"
+      >
+        {isLoading ? (
+          <div className="flex flex-col gap-4">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-20 w-full animate-pulse rounded-lg bg-white/5" />
+            ))}
+          </div>
+        ) : (
+          sortedItems.map((item, index) => {
+            // We need to find the ORIGINAL index to pass back to onItemClick
+            const originalIndex = items.findIndex(original => original.id === item.id);
+            return (
+              <SidebarItem
+                key={item.id || index}
+                item={item}
+                isActive={originalIndex === currentIndex}
+                onClick={() => onItemClick(originalIndex)}
+              />
+            );
+          })
+        )}
       </div>
     </div>
   );
@@ -317,8 +446,11 @@ function Sidebar({ items, currentIndex, onItemClick }) {
 
 function SidebarItem({ item, isActive, onClick }) {
   const getThumbnail = () => {
-    if (item.thumbnail) return item.thumbnail;
-    if (item.coverImage) return item.coverImage;
+    if (item.thumbnail) return getImageUrl(item.thumbnail);
+    if (item.coverImage) return getImageUrl(item.coverImage);
+    if (item.url) return getImageUrl(item.url);
+    if (item.id && !item.id.includes('-') && item.id.length > 20) return getImageUrl(item.id);
+
     if (item.youtubeUrl) {
       const videoId = item.youtubeUrl.split('v=')[1] || item.youtubeUrl.split('/').pop();
       return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
@@ -407,4 +539,13 @@ function IconButton({ icon: Icon, onClick, active = false }) {
       <Icon className="h-5 w-5" />
     </motion.button>
   );
+}
+
+// Helper
+function getImageUrl(url) {
+  if (!url) return null;
+  if (url.includes('drive.google.com') || (!url.includes('http') && url.length > 20)) {
+    return getDriveImageUrl(url);
+  }
+  return url;
 }

@@ -13,12 +13,15 @@ import {
   CameraIcon,
   SunIcon,
   BoltIcon,
-  AdjustmentsVerticalIcon
+  AdjustmentsVerticalIcon,
+  SparklesIcon,
+  SpeakerWaveIcon
 } from '@heroicons/react/24/outline';
 import { useApp } from '@/contexts/AppContext';
 import { HUD_MODES, ISO_VALUES, APERTURE_VALUES, SHUTTER_SPEEDS, WHITE_BALANCE_MODES } from '@/lib/constants/camera';
 import { cn } from '@/lib/utils/helpers';
 import BatteryIndicator from './BatteryIndicator';
+import useSound from '@/lib/hooks/useSound';
 
 export default function CameraHUD() {
   const {
@@ -39,7 +42,11 @@ export default function CameraHUD() {
     showFocusPeaking,
     setShowFocusPeaking,
     showZebra,
-    setShowZebra
+    setShowZebra,
+    isEcoMode,
+    toggleEcoMode,
+    isSoundEnabled,
+    toggleSound
   } = useApp();
 
   const [openPanel, setOpenPanel] = useState(null); // 'iso', 'aperture', 'shutter', 'wb', or null
@@ -246,6 +253,23 @@ export default function CameraHUD() {
                 {/* Battery */}
                 <BatteryIndicator />
 
+                {/* Eco Mode / FX Toggle */}
+                <HUDButton
+                  onClick={toggleEcoMode}
+                  icon={SparklesIcon}
+                  label={isEcoMode ? "Eco Mode" : "High Quality"}
+                  active={!isEcoMode}
+                  variant={isEcoMode ? "warning" : "default"}
+                />
+
+                {/* Sound Toggle */}
+                <HUDButton
+                  onClick={toggleSound}
+                  icon={SpeakerWaveIcon}
+                  label={isSoundEnabled ? "Sound ON" : "Sound OFF"}
+                  active={isSoundEnabled}
+                />
+
                 {/* HUD Toggle */}
                 <HUDButton
                   onClick={toggleHudMode}
@@ -297,6 +321,7 @@ export default function CameraHUD() {
 
 function HUDButton({ onClick, icon: Icon, label, active = false, variant = 'default' }) {
   const [showLabel, setShowLabel] = useState(false);
+  const { playClick, playHover } = useSound();
 
   const variants = {
     default: 'border-white/20 text-white/60 hover:bg-white/10 hover:text-white',
@@ -307,8 +332,14 @@ function HUDButton({ onClick, icon: Icon, label, active = false, variant = 'defa
   return (
     <div className="relative">
       <motion.button
-        onClick={onClick}
-        onMouseEnter={() => setShowLabel(true)}
+        onClick={() => {
+          playClick();
+          onClick();
+        }}
+        onMouseEnter={() => {
+          setShowLabel(true);
+          playHover();
+        }}
         onMouseLeave={() => setShowLabel(false)}
         className={cn(
           'flex h-8 w-8 items-center justify-center rounded border backdrop-blur-sm transition-all',

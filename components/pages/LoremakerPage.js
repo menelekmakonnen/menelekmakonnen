@@ -1,43 +1,112 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
+import { ArrowTopRightOnSquareIcon, MagnifyingGlassIcon, FunnelIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import LoadingScreen from '../ui/LoadingScreen';
 import { fetchLoremakerCharacters, getRandomCharacters, filterCharactersWithImages } from '@/lib/data/loremaker';
+import { getDriveImageUrl } from '@/lib/data/googleDrive';
+import MasonryAlbumGrid from '../album/MasonryAlbumGrid';
 import ItemGrid from '../album/ItemGrid';
 import SingleView from '../singleview/SingleView';
 
+import { useApp } from '@/contexts/AppContext';
+
 export default function LoremakerPage() {
-  const [characters, setCharacters] = useState([]);
-  const [singleViewItem, setSingleViewItem] = useState(null);
+  const { singleViewItem, openSingleView, closeSingleView } = useApp();
+  const [allCharacters, setAllCharacters] = useState([]); // Full dataset
+  const [displayedCharacters, setDisplayedCharacters] = useState([]); // Currently shown
+  const [loading, setLoading] = useState(true);
+
+  // Search & Filter State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState('All');
+  const [availableFactions, setAvailableFactions] = useState([]);
 
   useEffect(() => {
     // Fetch from Google Sheets using Gviz API
     const loadCharacters = async () => {
-      const allCharacters = await fetchLoremakerCharacters();
-      const charactersWithImages = filterCharactersWithImages(allCharacters);
-      const randomCharacters = getRandomCharacters(charactersWithImages, 20);
-      setCharacters(randomCharacters);
+      try {
+        setLoading(true);
+        const all = await fetchLoremakerCharacters();
+        if (!all) throw new Error('No data returned');
+
+        const withImages = filterCharactersWithImages(all);
+        setAllCharacters(withImages);
+
+        const factions = [...new Set(withImages.map(c => c.faction).filter(Boolean))].slice(0, 5);
+        setAvailableFactions(['All', ...factions]);
+
+        const randoms = getRandomCharacters(withImages, 20);
+        setDisplayedCharacters(randoms);
+      } catch (err) {
+        console.error('Failed to load Loremaker characters:', err);
+        // Fallback to empty to prevent crash
+        setAllCharacters([]);
+        setDisplayedCharacters([]);
+      } finally {
+        setLoading(false);
+      }
     };
 
     loadCharacters();
   }, []);
 
+  // Handle Search & Filter
+  useEffect(() => {
+    if (!allCharacters.length) return;
+
+    let result = allCharacters;
+
+    // 1. Filter by Search
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(c =>
+        c.character?.toLowerCase().includes(q) ||
+        c.alias?.toLowerCase().includes(q) ||
+        c.faction?.toLowerCase().includes(q) ||
+        c.location?.toLowerCase().includes(q)
+      );
+    }
+
+    // 2. Filter by Chip (Faction)
+    if (activeFilter !== 'All') {
+      result = result.filter(c => c.faction === activeFilter);
+    }
+
+    // 3. Selection Strategy
+    // If searching or filtering, show all results.
+    // If clearing everything (Search empty, Filter All), show random 20 again to avoid massive list?
+    // Actually, if user clears search, they might expect the "Home" state.
+
+    if (!searchQuery && activeFilter === 'All') {
+      // We don't want to re-randomize every keystroke, so only randomize if we explicitly reset?
+      // For now, let's just show up to 50 items if no search, or keep the previous randoms?
+      // Let's rely on the initial randoms if inputs are empty, UNLESS we just cleared them.
+      // Simplification: If inputs empty, show random 20. But verify dependency loop.
+      // To avoid loop, we won't put random logic here. We'll handle "Reset" separately.
+    } else {
+      setDisplayedCharacters(result.slice(0, 50)); // Cap at 50 results for perf
+    }
+  }, [searchQuery, activeFilter, allCharacters]);
+
   const handleItemClick = (item) => {
-    setSingleViewItem(item);
+    openSingleView(item);
   };
 
   const handleCloseSingleView = () => {
-    setSingleViewItem(null);
+    closeSingleView();
   };
 
-  const handleRefresh = async () => {
-    const allCharacters = await fetchLoremakerCharacters();
-    const charactersWithImages = filterCharactersWithImages(allCharacters);
-    const randomCharacters = getRandomCharacters(charactersWithImages, 20);
-    setCharacters(randomCharacters);
+  const handleRefresh = () => {
+    setSearchQuery('');
+    setActiveFilter('All');
+    const randoms = getRandomCharacters(allCharacters, 20);
+    setDisplayedCharacters(randoms);
   };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
+
+
       {/* Page header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -51,47 +120,79 @@ export default function LoremakerPage() {
           Explore the universe of characters and worlds
         </p>
 
-        <div className="mt-4 flex gap-3">
-          <motion.button
-            onClick={handleRefresh}
-            className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm text-white transition-all hover:bg-white/10"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            Show 20 Random Characters
-          </motion.button>
+        <div className="mt-6 flex flex-col gap-4">
+          {/* Search Bar */}
+          <div className="relative max-w-md">
+            <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-white/40" />
+            <input
+              type="text"
+              placeholder="Search characters, factions, locations..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-lg border border-white/20 bg-white/5 py-2 pl-10 pr-4 text-white placeholder-white/40 backdrop-blur-sm transition-all focus:border-purple-500/50 focus:bg-white/10 focus:outline-none"
+            />
+          </div>
 
-          <motion.a
-            href="https://loremaker.cloud"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 px-4 py-2 text-sm text-purple-400 transition-all hover:bg-purple-500/20"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <span>Full Loremaker Site</span>
-            <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-          </motion.a>
+          {/* Filters & Actions */}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Filter Chips */}
+            {availableFactions.map((faction) => (
+              <button
+                key={faction}
+                onClick={() => setActiveFilter(faction)}
+                className={`rounded-full border px-3 py-1 text-xs transition-all ${activeFilter === faction
+                  ? 'border-purple-500/50 bg-purple-500/20 text-purple-200'
+                  : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10'
+                  }`}
+              >
+                {faction}
+              </button>
+            ))}
+
+            <div className="h-4 w-px bg-white/10 mx-2" />
+
+            {/* Randomize Button */}
+            <motion.button
+              onClick={handleRefresh}
+              className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-3 py-1.5 text-sm text-white transition-all hover:bg-white/10"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ArrowPathIcon className="h-4 w-4" />
+              <span>Shuffle</span>
+            </motion.button>
+
+            {/* External Link */}
+            <motion.a
+              href="https://loremaker.cloud"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 px-3 py-1.5 text-sm text-purple-400 transition-all hover:bg-purple-500/20"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span>Full Site</span>
+              <ArrowTopRightOnSquareIcon className="h-4 w-4" />
+            </motion.a>
+          </div>
         </div>
       </motion.div>
 
       {/* Character grid */}
-      {characters.length > 0 ? (
-        <ItemGrid
-          items={characters.map(char => ({
-            ...char,
-            id: char.character,
-            name: char.character,
-            thumbnail: char.coverImage || char.galleryImages[0],
-            description: char.shortDescription
-          }))}
-          onItemClick={handleItemClick}
-          type="vertical"
-        />
-      ) : (
+      <ItemGrid
+        isLoading={loading}
+        items={displayedCharacters.map(char => ({
+          ...char,
+          id: char.character,
+          name: char.character,
+          thumbnail: getDriveImageUrl(char.coverImage || char.galleryImages[0]),
+          description: char.shortDescription
+        }))}
+        onItemClick={handleItemClick}
+        type="vertical"
+      />
+
+      {!loading && displayedCharacters.length === 0 && (
         <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/60">
           <div className="text-center">
             <p className="mb-4">No characters with images found.</p>
@@ -115,7 +216,7 @@ export default function LoremakerPage() {
         {singleViewItem && (
           <CharacterSingleView
             character={singleViewItem}
-            characters={characters}
+            characters={allCharacters}
             onClose={handleCloseSingleView}
           />
         )}
@@ -149,7 +250,7 @@ function CharacterSingleView({ character, characters, onClose }) {
             {/* Image */}
             <div className="relative aspect-square overflow-hidden rounded-lg">
               <img
-                src={character.coverImage || character.galleryImages?.[0]}
+                src={getDriveImageUrl(character.coverImage || character.galleryImages?.[0])}
                 alt={character.character}
                 className="h-full w-full object-cover"
               />
@@ -163,7 +264,7 @@ function CharacterSingleView({ character, characters, onClose }) {
                 </h2>
                 {character.alias && (
                   <p className="mt-1 text-lg text-white/60">
-                    "{character.alias}"
+                    &quot;{character.alias}&quot;
                   </p>
                 )}
               </div>

@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FILMS, MUSIC_VIDEOS } from '@/lib/data/films';
+import { getDriveImageUrl } from '@/lib/data/googleDrive';
 import AlbumGrid from '../album/AlbumGrid';
+import MasonryAlbumGrid from '../album/MasonryAlbumGrid';
 import ItemGrid from '../album/ItemGrid';
 import SingleView from '../singleview/SingleView';
 
@@ -83,7 +85,7 @@ export default function FilmsPage() {
           </motion.div>
 
           {/* Album grid */}
-          <AlbumGrid albums={albums} onAlbumClick={handleAlbumClick} />
+          <AlbumGrid albums={albums} onAlbumClick={handleAlbumClick} variant="horizontal" />
         </>
       ) : (
         <>
@@ -113,7 +115,11 @@ export default function FilmsPage() {
 
           {/* Item grid */}
           <ItemGrid
-            items={selectedAlbum.items}
+            items={selectedAlbum.items.map(item => ({
+              ...item,
+              // Ensure video thumbnail is resolved
+              thumbnail: item.thumbnail || (item.youtubeUrl ? `https://img.youtube.com/vi/${item.youtubeUrl.split('v=')[1]}/maxresdefault.jpg` : null)
+            }))}
             onItemClick={handleItemClick}
             type="horizontal"
           />
