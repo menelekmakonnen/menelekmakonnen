@@ -19,7 +19,9 @@ export default function CachedImage({ src, alt, className, style, ...props }) {
 
             // Skip caching for known CORS-restricted domains
             const restrictedDomains = ['instagram.com', 'cdninstagram.com', 'fbcdn.net', 'facebook.com', 'drive.google.com', 'googleusercontent.com'];
-            if (restrictedDomains.some(domain => src.includes(domain))) {
+            const isRestricted = typeof src === 'string' && restrictedDomains.some(domain => src.toLowerCase().includes(domain));
+
+            if (isRestricted) {
                 if (active) setObjectUrl(src);
                 return;
             }
