@@ -101,7 +101,7 @@ function TopLeftInfo({ currentPage }) {
     <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
-      className="fixed top-20 left-4 z-30 space-y-1 font-mono text-xs text-white/60"
+      className="pointer-events-none fixed top-20 left-4 z-30 space-y-1 font-mono text-xs text-white/60"
     >
       <div className="rounded border border-white/10 bg-black/30 px-2 py-1 backdrop-blur-sm">
         {PAGE_DISPLAY_NAMES[currentPage] || 'UNKNOWN'}
@@ -146,7 +146,7 @@ function TopRightInfo() {
     <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
-      className="fixed top-20 right-4 z-30 space-y-2 text-right font-mono text-xs"
+      className="pointer-events-none fixed top-20 right-4 z-30 space-y-2 text-right font-mono text-xs"
     >
       {/* Greeting */}
       <div className="text-white/60">

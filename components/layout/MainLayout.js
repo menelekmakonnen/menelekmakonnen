@@ -10,10 +10,14 @@ import InfoOverlays from '../overlays/InfoOverlays';
 import CameraCursor from '../cursor/CameraCursor';
 import KeyboardShortcutsHelp from '../overlays/KeyboardShortcutsHelp';
 import CachePermissionPopup from '../common/CachePermissionPopup';
+import useKeyboardNavigation from '@/lib/hooks/useKeyboardNavigation';
 
 export default function MainLayout({ children }) {
   const { singleViewItem, visualState } = useApp();
   const theme = getThemeForTime();
+
+  // Enable keyboard navigation
+  useKeyboardNavigation();
 
   return (
     <>

@@ -9,6 +9,7 @@ import LinksPage from '@/components/pages/LinksPage';
 import LoremakerPage from '@/components/pages/LoremakerPage';
 import PhotographyPage from '@/components/pages/PhotographyPage';
 import AIAlbumsPage from '@/components/pages/AIAlbumsPage';
+import BlogPage from '@/components/pages/BlogPage';
 
 export default function Home() {
   const { isPoweredOn, currentPage } = useApp();
@@ -34,6 +35,8 @@ export default function Home() {
         return <PhotographyPage />;
       case PAGES.AI_ALBUMS:
         return <AIAlbumsPage />;
+      case PAGES.BLOG:
+        return <BlogPage />;
       default:
         return <HomePage />;
     }

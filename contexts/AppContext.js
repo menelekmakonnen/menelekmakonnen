@@ -151,6 +151,28 @@ export function AppProvider({ children }) {
     setCurrentPage(PAGES.HOME);
     resetDailyCovers(); // New daily thumbnails on power on
 
+    // Pre-load Photography and AI Albums in the background
+    (async () => {
+      try {
+        const [photoRes, aiRes] = await Promise.all([
+          fetch('/api/albums?type=photography'),
+          fetch('/api/albums?type=ai')
+        ]);
+
+        if (photoRes.ok) {
+          const photoData = await photoRes.json();
+          setPhotographyAlbums(photoData);
+        }
+
+        if (aiRes.ok) {
+          const aiData = await aiRes.json();
+          setAiAlbums(aiData);
+        }
+      } catch (err) {
+        console.error('Failed to pre-load albums:', err);
+      }
+    })();
+
     // Check if first visit
     const hasVisited = localStorage.getItem('hasVisited');
     if (!hasVisited) {

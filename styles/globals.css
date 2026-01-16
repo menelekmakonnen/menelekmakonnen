@@ -19,6 +19,7 @@
   body {
     @apply bg-black text-white antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    cursor: none;
   }
 
   html {
