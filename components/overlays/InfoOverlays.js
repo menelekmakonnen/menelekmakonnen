@@ -19,9 +19,6 @@ function getFileCount(currentPage) {
       return Object.values(VIDEO_EDIT_ALBUMS).reduce((total, album) => total + album.items.length, 0);
     case PAGES.LINKS:
       return ALL_LINKS.length;
-    case PAGES.LOREMAKER:
-      // Loremaker loads dynamically, so we show a placeholder
-      return '~200+';
     case PAGES.PHOTOGRAPHY:
     case PAGES.AI_ALBUMS:
       // These will be loaded from Google Drive in the future

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   HomeIcon,
-  BookOpenIcon,
   FilmIcon,
   CameraIcon,
   SparklesIcon,
@@ -19,7 +18,6 @@ export default function Header() {
 
   const pageIcons = {
     [PAGES.HOME]: HomeIcon,
-    [PAGES.LOREMAKER]: BookOpenIcon,
     [PAGES.FILMS]: FilmIcon,
     [PAGES.PHOTOGRAPHY]: CameraIcon,
     [PAGES.AI_ALBUMS]: SparklesIcon,

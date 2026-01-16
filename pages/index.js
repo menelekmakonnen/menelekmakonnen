@@ -6,7 +6,7 @@ import HomePage from '@/components/pages/HomePage';
 import FilmsPage from '@/components/pages/FilmsPage';
 import VideoEditsPage from '@/components/pages/VideoEditsPage';
 import LinksPage from '@/components/pages/LinksPage';
-import LoremakerPage from '@/components/pages/LoremakerPage';
+// import LoremakerPage from '@/components/pages/LoremakerPage';
 import PhotographyPage from '@/components/pages/PhotographyPage';
 import AIAlbumsPage from '@/components/pages/AIAlbumsPage';
 import BlogPage from '@/components/pages/BlogPage';
@@ -29,8 +29,6 @@ export default function Home() {
         return <VideoEditsPage />;
       case PAGES.LINKS:
         return <LinksPage />;
-      case PAGES.LOREMAKER:
-        return <LoremakerPage />;
       case PAGES.PHOTOGRAPHY:
         return <PhotographyPage />;
       case PAGES.AI_ALBUMS:
