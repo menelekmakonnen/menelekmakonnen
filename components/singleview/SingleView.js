@@ -43,6 +43,28 @@ export default function SingleView({ item, items, albums = [], currentAlbumId, o
 
   const currentItem = currentItems[currentIndex] || item;
 
+  const handlePrevious = useCallback(() => {
+    setCurrentIndex(prev => (prev > 0 ? prev - 1 : currentItems.length - 1));
+  }, [currentItems.length]);
+
+  const handleNext = useCallback(() => {
+    setCurrentIndex(prev => (prev < currentItems.length - 1 ? prev + 1 : 0));
+  }, [currentItems.length]);
+
+  const handlePreviousAlbum = useCallback(() => {
+    if (albums.length === 0) return;
+    const currentAlbumIndex = albums.findIndex(a => a.id === selectedAlbumId);
+    const prevIndex = currentAlbumIndex > 0 ? currentAlbumIndex - 1 : albums.length - 1;
+    setSelectedAlbumId(albums[prevIndex].id);
+  }, [albums, selectedAlbumId]);
+
+  const handleNextAlbum = useCallback(() => {
+    if (albums.length === 0) return;
+    const currentAlbumIndex = albums.findIndex(a => a.id === selectedAlbumId);
+    const nextIndex = currentAlbumIndex < albums.length - 1 ? currentAlbumIndex + 1 : 0;
+    setSelectedAlbumId(albums[nextIndex].id);
+  }, [albums, selectedAlbumId]);
+
   // Slideshow timer
   useEffect(() => {
     if (!isSlideshowActive) return;
@@ -119,28 +141,6 @@ export default function SingleView({ item, items, albums = [], currentAlbumId, o
 
     loadNewAlbum();
   }, [selectedAlbumId, currentAlbumId, items]);
-
-  const handlePrevious = useCallback(() => {
-    setCurrentIndex(prev => (prev > 0 ? prev - 1 : currentItems.length - 1));
-  }, [currentItems.length]);
-
-  const handleNext = useCallback(() => {
-    setCurrentIndex(prev => (prev < currentItems.length - 1 ? prev + 1 : 0));
-  }, [currentItems.length]);
-
-  const handlePreviousAlbum = useCallback(() => {
-    if (albums.length === 0) return;
-    const currentAlbumIndex = albums.findIndex(a => a.id === selectedAlbumId);
-    const prevIndex = currentAlbumIndex > 0 ? currentAlbumIndex - 1 : albums.length - 1;
-    setSelectedAlbumId(albums[prevIndex].id);
-  }, [albums, selectedAlbumId]);
-
-  const handleNextAlbum = useCallback(() => {
-    if (albums.length === 0) return;
-    const currentAlbumIndex = albums.findIndex(a => a.id === selectedAlbumId);
-    const nextIndex = currentAlbumIndex < albums.length - 1 ? currentAlbumIndex + 1 : 0;
-    setSelectedAlbumId(albums[nextIndex].id);
-  }, [albums, selectedAlbumId]);
 
   if (!mounted) return null;
 
