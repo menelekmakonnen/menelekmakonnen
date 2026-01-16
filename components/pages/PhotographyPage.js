@@ -61,25 +61,6 @@ export default function PhotographyPage() {
 
 
 
-  // Fetch albums on mount
-  useEffect(() => {
-    async function fetchAlbums() {
-      try {
-        setLoading(true);
-        const res = await fetch('/api/albums?type=photography');
-        if (!res.ok) throw new Error('Failed to fetch albums');
-        const data = await res.json();
-        setAlbums(data);
-      } catch (err) {
-        console.error('Error fetching photography albums:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchAlbums();
-  }, []);
 
   // Use fetched albums instead of mock categories
   // Note: We might want to categorize them later based on folder structure

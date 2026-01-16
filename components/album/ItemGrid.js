@@ -232,6 +232,14 @@ function ItemCard({ item, index, type, onClick }) {
             alt={item.title || item.name || item.character}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
             loading="lazy"
+            referrerPolicy="no-referrer"
+            onError={(e) => {
+              // Fallback for broken Instagram thumbnails
+              if (item.instagramUrl) {
+                e.target.style.display = 'none';
+                e.target.parentElement.classList.add('flex', 'items-center', 'justify-center', 'bg-gradient-to-br', 'from-purple-900/20', 'via-pink-900/20', 'to-orange-900/20');
+              }
+            }}
           />
           {/* Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />

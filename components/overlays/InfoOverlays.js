@@ -118,7 +118,7 @@ function TopLeftInfo({ currentPage }) {
           <button
             key={`slot-${index}`}
             onClick={() => handleSubtitleClick(index)}
-            className="relative min-h-[16px] cursor-pointer text-left transition-colors hover:text-white/80"
+            className="relative min-h-[16px] pointer-events-auto cursor-pointer text-left transition-colors hover:text-white/80"
           >
             <AnimatePresence mode="wait">
               <motion.span

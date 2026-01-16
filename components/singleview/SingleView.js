@@ -52,7 +52,7 @@ export default function SingleView({ item, items, albums = [], currentAlbumId, o
     }, slideshowInterval);
 
     return () => clearInterval(timer);
-  }, [isSlideshowActive, slideshowInterval, currentIndex]);
+  }, [isSlideshowActive, slideshowInterval, currentIndex, handleNext]);
 
   // Keyboard navigation (W/S for items, A/D for albums)
   useEffect(() => {
@@ -93,7 +93,7 @@ export default function SingleView({ item, items, albums = [], currentAlbumId, o
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, selectedAlbumId, albums]);
+  }, [currentIndex, selectedAlbumId, albums, handleNext, handleNextAlbum, handlePrevious, handlePreviousAlbum]);
 
   // Handle Album Change
   useEffect(() => {
@@ -338,6 +338,7 @@ function ImageDisplay({ src, alt, expanded }) {
         style={{
           transform: expanded ? `scale(${zoom})` : 'none'
         }}
+        referrerPolicy="no-referrer"
       />
 
       {/* Zoom reset button */}

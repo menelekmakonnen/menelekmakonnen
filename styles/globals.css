@@ -4,16 +4,17 @@
 
 @layer base {
   * {
-    user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+    user-select: none;
   }
 
   /* Allow selection for inputs */
-  input, textarea {
-    user-select: text !important;
+  input,
+  textarea {
     -webkit-user-select: text !important;
+    user-select: text !important;
   }
 
   body {
@@ -28,6 +29,7 @@
 }
 
 @layer utilities {
+
   /* Glassmorphism utilities */
   .glass {
     @apply bg-white/5 backdrop-blur-xl border border-white/10;
