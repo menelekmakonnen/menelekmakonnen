@@ -8,8 +8,6 @@ import CameraOverlays from '../hud/CameraOverlays';
 import CameraVisualEffects from '../hud/CameraVisualEffects';
 import InfoOverlays from '../overlays/InfoOverlays';
 import CameraCursor from '../cursor/CameraCursor';
-import KeyboardHandler from './KeyboardHandler';
-import PowerOffConfirm from '../power/PowerOffConfirm';
 import KeyboardShortcutsHelp from '../overlays/KeyboardShortcutsHelp';
 import CachePermissionPopup from '../common/CachePermissionPopup';
 
@@ -19,9 +17,6 @@ export default function MainLayout({ children }) {
 
   return (
     <>
-      {/* Keyboard event handler */}
-      <KeyboardHandler />
-
       {/* Custom cursor */}
       <CameraCursor />
 
@@ -55,9 +50,6 @@ export default function MainLayout({ children }) {
 
         {/* HUD */}
         <CameraHUD />
-
-        {/* Power off confirmation */}
-        <PowerOffConfirm />
 
         {/* Permission Popup */}
         <CachePermissionPopup />
